@@ -1,0 +1,23 @@
+
+KongTiao  йсм╪ SQL 
+
+
+SELECT LTrim(Str(KongtiaoWopu.PTYS))+'/'+LTrim(Str(KongtiaoWopu.PTYZ))+'/'+LTrim(Str(KongtiaoWopu.PTYX)) AS PTYw, LTrim(Str(KongtiaoWopu.PKYS))+'/'+LTrim(Str(KongtiaoWopu.PKYZ))+'/'+LTrim(Str(KongtiaoWopu.PKYX)) AS PKYw, LTrim(Str(KongtiaoWopu.KSYS))+'/'+LTrim(Str(KongtiaoWopu.KSYZ))+'/'+LTrim(Str(KongtiaoWopu.KSYX)) AS KSYw, LTrim(Str(KongtiaoWopu.PTRS))+'/'+LTrim(Str(KongtiaoWopu.PTRX)) AS PTRw, LTrim(Str(KongtiaoWopu.PKRS))+'/'+LTrim(Str(KongtiaoWopu.PKRX)) AS PKRw, LTrim(Str(KongtiaoWopu.KSRS))+'/'+LTrim(Str(KongtiaoWopu.KSRX)) AS KSRw, KongtiaoZuowei.PTY, KongtiaoZuowei.PKY, KongtiaoZuowei.KSY, KongtiaoZuowei.PTR, KongtiaoZuowei.PKR, KongtiaoZuowei.KSR, KongtiaoZuowei.S, KongtiaoZuowei.E, KongtiaoZuowei.ID
+FROM KongtiaoWopu INNER JOIN KongtiaoZuowei ON KongtiaoWopu.ID=KongtiaoZuowei.ID
+
+==============================================
+
+PuTong  йсм╪ SQL
+
+SELECT LTrim(Str(putongWopu.PTYS))+'/'+LTrim(Str(putongWopu.PTYZ))+'/'+LTrim(Str(putongWopu.PTYX)) AS PTYw, LTrim(Str(putongWopu.PKYS))+'/'+LTrim(Str(putongWopu.PKYZ))+'/'+LTrim(Str(putongWopu.PKYX)) AS PKYw, LTrim(Str(putongWopu.KSYS))+'/'+LTrim(Str(putongWopu.KSYZ))+'/'+LTrim(Str(putongWopu.KSYX)) AS KSYw, LTrim(Str(putongWopu.PTRS))+'/'+LTrim(Str(putongWopu.PTRX)) AS PTRw, LTrim(Str(putongWopu.PKRS))+'/'+LTrim(Str(putongWopu.PKRX)) AS PKRw, LTrim(Str(putongWopu.KSRS))+'/'+LTrim(Str(putongWopu.KSRX)) AS KSRw, putongZuowei.PTY, putongZuowei.PKY, putongZuowei.KSY, putongZuowei.PTR, putongZuowei.PKR, putongZuowei.KSR, putongZuowei.KTY AS KT, putongZuowei.S, putongZuowei.E, putongZuowei.ID
+FROM putongWopu INNER JOIN putongZuowei ON putongWopu.ID = putongZuowei.ID
+
+==============================================
+
+PuTong_KT  йсм╪ SQL
+
+SELECT LTrim(Str(putongWopu.PTYS+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.PTYZ+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.PTYX+putongWopu.KTY)) AS PTYw, LTrim(Str(putongWopu.PKYS+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.PKYZ+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.PKYX+putongWopu.KTY)) AS PKYw, LTrim(Str(putongWopu.KSYS+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.KSYZ+putongWopu.KTY))+'/'+LTrim(Str(putongWopu.KSYX+putongWopu.KTY)) AS KSYw, LTrim(Str(putongWopu.PTRS+putongWopu.KTR))+'/'+LTrim(Str(putongWopu.PTRX+putongWopu.KTR)) AS PTRw, LTrim(Str(putongWopu.PKRS+putongWopu.KTR))+'/'+LTrim(Str(putongWopu.PKRX+putongWopu.KTR)) AS PKRw, LTrim(Str(putongWopu.KSRS+putongWopu.KTR))+'/'+LTrim(Str(putongWopu.KSRX+putongWopu.KTR)) AS KSRw, putongZuowei.PTY+putongZuowei.KTY AS KTYz, putongZuowei.PKY+putongZuowei.KTY AS PKYz, putongZuowei.KSY+putongZuowei.KTY AS KSYz, putongZuowei.PTR+putongZuowei.KTR AS PTRz, putongZuowei.PKR+putongZuowei.KTR AS PKRz, putongZuowei.KSR+putongZuowei.KTR AS KSRz, 
+putongZuowei.S, putongZuowei.E, putongZuowei.ID
+FROM putongWopu INNER JOIN putongZuowei ON putongWopu.ID = putongZuowei.ID
+
+
