@@ -1,15 +1,3 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/train
-    username: train_admin
-    password: training
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    database: postgresql
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.PostgreSQLDialect
-        temp:
-          use_jdbc_metadata_defaults: false
+  profiles:
+    active: dev

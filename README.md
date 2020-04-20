@@ -4,7 +4,7 @@
 
 Detail in data/relation
 
-![image-20200416124623457](D:\Program\DB_Project\data\relation\relation.png)
+![image-20200416124623457](https://github.com/monkeyboiii/DB_Project/blob/master/Data/relation/relation.png)
 
 ## Organize
 

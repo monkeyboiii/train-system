@@ -30,7 +30,8 @@ create table timetable
     depart_time   time,
     arrive_day    integer,
     constraint timetable_pk
-        primary key (train_code, station_name)
+        primary key (train_code, station_name, station_order)
+   	-- use three field to avoid roundabout train_route
 );
 
 
