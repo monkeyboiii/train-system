@@ -7,8 +7,8 @@ spring:
 
 
 mybatis:
-  mapper-locations: classpath*:/mapper/*.xml
-  type-aliases-package: train.model
+  mapper-locations: classpath*:/mapper/*.xml # classpath in target folder
+  type-aliases-package: train.model # important, affects .xml files
   configuration:
     auto-mapping-behavior: full
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

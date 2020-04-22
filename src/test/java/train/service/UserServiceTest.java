@@ -1,4 +1,4 @@
-package train;
+package train.service;
 
 public class UserServiceTest {
 }

@@ -1,19 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="train.mapper.CityMapper">
 
-    <!--Use when not strictly 1 to 1-->
-    <!--<resultMap id="City" type="com.train.model.City">
-        <result column="city_code" jdbcType="INTEGER" property="city_code"/>
-        <result column="city_name" jdbcType="VARCHAR" property="city_name"/>
-        <result column="province_name" jdbcType="VARCHAR" property="province_name"/>
-    </resultMap>-->
-
     <select id="queryByCode" parameterType="int" resultType="City">
-        select * from city where city_code = #{city_code};
+        select *
+        from city
+        where city_code = #{city_code};
+    </select>
+
+    <select id="queryByName" parameterType="String" resultType="City">
+        select *
+        from city
+        where city_name = #{city_name};
+    </select>
+
+    <select id="queryByProvince" parameterType="String" resultType="City">
+        select *
+        from city
+        where province_name = #{province_name};
+    </select>
+
+    <!--No longer needed-->
+    <select id="queryAll" parameterType="int" resultType="City">
+        select *
+        from city
+        limit #{limit};
     </select>
 
 </mapper>
