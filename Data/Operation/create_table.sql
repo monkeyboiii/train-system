@@ -1,17 +1,16 @@
-create table city
+create table if not exists city
 (
     city_code     integer
         primary key,
-    city_name     varchar,
-    province_name varchar
+    city_name     varchar not null,
+    province_name varchar not null
 );
 
 
-create table station
+create table if not exists station
 (
     station_name varchar
-        constraint station_pk
-            primary key,
+        primary key,
     station_code integer unique,
     city_code    integer not null
         constraint station_fk
@@ -19,7 +18,7 @@ create table station
 );
 
 
-create table timetable
+create table if not exists timetable
 (
     train_code    varchar,
     station_name  varchar
@@ -35,40 +34,70 @@ create table timetable
 );
 
 
-create table train_route
+create table if not exists route
 (
-    route_id       serial  not null
-        constraint train_route_pk
+    route_id serial  not null
             primary key,
     train_code     varchar not null,
     depart_station varchar
-        constraint train_route_fk
+        constraint route_fk
             references station (station_name),
     arrive_station varchar
-        constraint train_route_fk_2
-            references station (station_name),
-    constraint train_route_unique
-        unique (train_code, depart_station, arrive_station)
+        constraint route_fk_2
+            references station (station_name)
 );
 
+create table if not exists route_price
+(
+    rp_id serial  not null
+            primary key,
+	route_id int
+		constraint route_price_fk
+            references route (route_id),
+	seat_type varchar not null,
+	price double precision not null,
+	total_num int not null
 
-create table ticket_set
+);
+
+create table if not exists ticket_set
 (
     ticket_set_id serial not null
         constraint ticket_set_pk
             primary key,
-    train_code    varchar,
-    route_id      integer
-        constraint train_route_fk
-            references train_route (route_id),
-    seat_type     varchar,
-    price         decimal(6, 2),
+    rp_id      integer
+        constraint ticket_price_fk
+            references route_price (rp_id),
     ticket_date   date,
     remain        integer
 );
 
+-- reduce shadow naming
+create table if not exists users
+(
+    user_id  serial  not null
+        constraint users_pk
+            primary key,
+    username varchar,
+    id       varchar unique,
+    phone    varchar,
+    password varchar not null
+);
 
-create table ticket
+-- reduce shadow naming
+create table if not exists orders
+(
+    order_id    serial not null
+        constraint orders_pk
+            primary key,
+    create_time timestamp,
+    status      varchar,
+    user_id     integer
+        constraint orders_fk
+            references users (user_id)
+);
+
+create table if not exists ticket
 (
     ticket_id     serial  not null
         constraint ticket_pk
@@ -83,28 +112,3 @@ create table ticket
 );
 
 
--- reduce shadow naming
-create table orders
-(
-    order_id    serial not null
-        constraint orders_pk
-            primary key,
-    create_time timestamp,
-    status      varchar,
-    user_id     integer
-        constraint orders_fk
-            references users (user_id)
-);
-
-
--- reduce shadow naming
-create table users
-(
-    user_id  serial  not null
-        constraint users_pk
-            primary key,
-    username varchar,
-    id       varchar unique,
-    phone    varchar,
-    password varchar not null
-);
