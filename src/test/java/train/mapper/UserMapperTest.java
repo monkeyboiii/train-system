@@ -1,4 +1,4 @@
-package train.controller;
+package train.mapper;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,23 +13,26 @@ import train.model.User;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Slf4j
-public class UserControllerTest {
+public class UserMapperTest {
 
     @Autowired
     UserMapper userMapper;
 
     @Test
-    public void insertUserTest() {
+    public void postUserTest() {
         User user = new User(
                 "Monkey",
-                "33010320000416161X",
-                "13467839784",
+                "31010320050226161X",
+                "13767839784",
                 "6969");
         System.out.println(user);
         userMapper.insertUser(user);
 
         User myUser = userMapper.queryUserByUsername("Monkey");
         System.out.println(myUser);
+
+        // Here we know the
+        userMapper.updateUser(2,"pussycat");
 
     }
 }

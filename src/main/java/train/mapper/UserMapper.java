@@ -8,12 +8,16 @@ import java.util.Map;
 @Repository
 public interface UserMapper {
 
-    // Can trace user_id using username, id or phone
-    int getPrimaryKey(Map<String, String> map);
+    /**
+     * Can trace user_id using username, id or phone.
+     * Map contains the relations of the key-value pair,
+     * e.g. {"key" = "username", "value" = "135****4691"}
+     */
+    Integer getPrimaryKey(Map<String, String> map);
 
     void insertUser(User user);
 
-    void updateUser(int user_id, String password);
+    void updateUser(Integer user_id, String password);
 
     User queryUserByUsername(String username);
 
@@ -21,6 +25,6 @@ public interface UserMapper {
 
     User queryUserByPhone(String phone);
 
-    void deleteUser(int user_id);
+    void deleteUser(Integer user_id);
 
 }

@@ -3,20 +3,47 @@ package train.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import train.model.Order;
 import train.model.User;
+import train.service.OrderService;
 import train.service.UserService;
 
+import java.util.List;
+
+/**
+ * Controls the behavior of a client's user-requests,
+ * including basic user-related CRUD, plus create/modify/delete orders.
+ * <p>
+ * The parameter value supports username, id, phone.
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
 
     @Autowired
+    OrderService orderService;
+    @Autowired
     UserService userService;
 
-    @PutMapping("/users") // Create
+    @GetMapping("/users/{value}/orders") // See all orders
+    public List<Order> queryOrder(@PathVariable String value) {
+        Integer user_id = userService.getUserId(value);
+        return orderService.queryOrdersByUserId(user_id);
+    }
+
+
+    @PutMapping("/users/{value}/orders") // Generate order
+    public int createOrder(@PathVariable String value) {
+        Integer user_id = userService.getUserId(value);
+        return orderService.createOrderForUserId(user_id);
+    }
+
+
+    @PutMapping("/users")
     public int insertUser(@RequestBody User user) {
         return userService.insertUser(user);
     }
+
 
     /*@PutMapping("/users") // Create
     public User insertUser(@RequestParam("username") String username,
@@ -34,18 +61,24 @@ public class UserController {
     }*/
 
 
-    @GetMapping("/users/{value}") // Supports username, id, phone
+    /**
+     * Supports get user_id from provided username, id or phone,
+     * returns null if non-existing
+     */
+    @GetMapping("/users/{value}")
     public User queryUser(@PathVariable String value) {
         return userService.queryUser(value);
     }
 
-    @PostMapping("/users/{value}") // value = field, can only update password
+
+    @PostMapping("/users/{value}") // Can only update password
     public int updateUser(@PathVariable String value,
-                           @RequestParam("password") String password) {
-        return userService.updateUser(value,password);
+                          @RequestParam("password") String password) {
+        return userService.updateUser(value, password);
     }
 
-    @DeleteMapping("/Users/{value}") // Supports username, id, phone
+
+    @DeleteMapping("/users/{value}")
     public int deleteUser(@PathVariable String value) {
         return userService.deleteUser(value);
     }

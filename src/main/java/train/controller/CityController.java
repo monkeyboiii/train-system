@@ -17,12 +17,14 @@ public class CityController {
     @Autowired
     private CityService cityService;
 
+
     @GetMapping("/city/{value}") // Supports code and name
     public City queryCity(@PathVariable String value) {
         return cityService.queryCity(value);
     }
 
-    @GetMapping("/cities/{value}") // Cities in province
+
+    @GetMapping("/cities/{value}") // Cities in a province
     public List<City> queryByProvince(@PathVariable String value) {
         return cityService.queryByProvince(value);
     }

@@ -1,14 +1,24 @@
 package train.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@Builder
+import java.util.List;
+
+/**
+ * A city has multiple stations
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class City {
-    private int city_code;
+    @ToString.Exclude
+    private Integer city_code;
+
     private String city_name;
     private String province_name;
-    // TODO: Add station/train list
+
+    private List<Station> stations; // Names
 
 }

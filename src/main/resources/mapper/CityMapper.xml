@@ -4,29 +4,39 @@
 
 <mapper namespace="train.mapper.CityMapper">
 
-    <select id="queryByCode" parameterType="int" resultType="City">
-        select *
-        from city
-        where city_code = #{city_code};
+    <resultMap id="CityResultMap" type="City">
+
+        <id property="city_code" column="city_code"/>
+        <result property="city_name" column="city_name"/>
+        <result property="province_name" column="province_name"/>
+
+        <collection property="stations" ofType="Station">
+            <!--select="train.mapper.StationMapper.queryStationByCityCode">-->
+        </collection>
+    </resultMap>
+
+
+    <select id="queryByCode" parameterType="int" resultMap="CityResultMap">
+        select c.city_code, c.city_name, c.province_name, s.station_name
+        from city c
+                 left join station s on c.city_code = s.city_code -- So that cities without stations stays
+        where c.city_code = #{city_code}
     </select>
 
-    <select id="queryByName" parameterType="String" resultType="City">
-        select *
-        from city
-        where city_name = #{city_name};
+
+    <select id="queryByName" parameterType="String" resultMap="CityResultMap">
+        select c.city_code, c.city_name, c.province_name, s.station_name
+        from city c
+                 left join station s on c.city_code = s.city_code
+        where c.city_name = #{city_name};
     </select>
 
-    <select id="queryByProvince" parameterType="String" resultType="City">
-        select *
-        from city
+
+    <select id="queryByProvince" parameterType="String" resultMap="CityResultMap">
+        select c.city_code, c.city_name, c.province_name, s.station_name
+        from city c
+                 left join station s on c.city_code = s.city_code
         where province_name = #{province_name};
-    </select>
-
-    <!--No longer needed-->
-    <select id="queryAll" parameterType="int" resultType="City">
-        select *
-        from city
-        limit #{limit};
     </select>
 
 </mapper>

@@ -16,39 +16,38 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public int insertUser(User user) {
-        if (!isPhone(user.getPhone()) || !isId(user.getId())) {
-            return 0;
-        }
-        userMapper.insertUser(user);
-        return 1;
-    }
-
-    // Value is a matcher
-    public int updateUser(String value, String password) {
-        Map<String, String> map = new HashMap<>();
+    public Integer getUserId(String value) {
+        Map<String, String> map = new HashMap<>(); // Value is a matcher
         if (isPhone(value)) {
             map.put("key", "phone");
             map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-
-            // TODO: Add exception, same for every other
-
-            userMapper.updateUser(user_id, password);
-            return 1;
         } else if (isId(value)) {
             map.put("key", "id");
             map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-            userMapper.updateUser(user_id, password);
-            return 1;
         } else {
             map.put("key", "username");
             map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-            userMapper.updateUser(user_id, password);
+        }
+        return userMapper.getPrimaryKey(map); // May be null
+    }
+
+    public int insertUser(User user) {
+        if (!isPhone(user.getPhone()) || !isId(user.getId())) {
+            return 0;
+        } else if (user.equals(queryUser(user.getPhone())) || user.equals(queryUser(user.getId()))) {
+            return 0;
+        } else {
+            userMapper.insertUser(user);
             return 1;
         }
+    }
+
+    public int updateUser(String value, String password) {
+        Integer user_id = getUserId(value);
+        if (user_id == null)
+            return 0;
+        userMapper.updateUser(user_id, password);
+        return 1;
     }
 
     public User queryUser(String value) {
@@ -62,28 +61,11 @@ public class UserService {
     }
 
     public int deleteUser(String value) {
-        Map<String, String> map = new HashMap<>();
-        if (isPhone(value)) {
-            map.put("key", "phone");
-            map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-            userMapper.deleteUser(user_id);
-            return 1;
-        } else if (isId(value)) {
-            map.put("key", "id");
-            map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-            userMapper.deleteUser(user_id);
-            return 1;
-        } else {
-            map.put("key", "username");
-            map.put("value", value);
-            int user_id = userMapper.getPrimaryKey(map);
-            if (user_id == 0)
-                return 0;
-            userMapper.deleteUser(user_id);
-            return 1;
-        }
+        Integer user_id = getUserId(value);
+        if (user_id == null)
+            return 0;
+        userMapper.deleteUser(user_id);
+        return 1;
     }
 
     private static boolean isPhone(String str) {

@@ -5,18 +5,11 @@
 
 <mapper namespace="train.mapper.UserMapper">
 
-    <!--Use when not strictly 1 to 1-->
-    <!--<resultMap id="City" type="com.train.model.City">
-        <result column="city_code" jdbcType="INTEGER" property="city_code"/>
-        <result column="city_name" jdbcType="VARCHAR" property="city_name"/>
-        <result column="province_name" jdbcType="VARCHAR" property="province_name"/>
-    </resultMap>-->
-
-
     <select id="getPrimaryKey" parameterType="java.util.Map" resultType="int">
         select user_id
         from users
-        where ${key} = #{value}; <!--$ discards quotes of a string-->
+        where ${key} = #{value};
+        <!--$ discards quotes of a string-->
     </select>
 
     <insert id="insertUser" parameterType="User">
