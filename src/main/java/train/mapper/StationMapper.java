@@ -8,6 +8,7 @@ import java.util.List;
 @Repository
 public interface StationMapper {
 
+    @Deprecated
     List<Station> queryStationByCityCode(Integer city_code);
 
 }

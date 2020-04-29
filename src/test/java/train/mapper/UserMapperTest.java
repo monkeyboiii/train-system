@@ -20,18 +20,17 @@ public class UserMapperTest {
 
     @Test
     public void postUserTest() {
-        User user = new User(
+        /*User user = new User(
                 "Monkey",
                 "31010320050226161X",
                 "13767839784",
                 "6969");
         System.out.println(user);
-        userMapper.insertUser(user);
+        userMapper.insertUser(user);*/
 
-        User myUser = userMapper.queryUserByUsername("Monkey");
+        User myUser = userMapper.queryUserByUsername("Calvin");
         System.out.println(myUser);
 
-        // Here we know the
         userMapper.updateUser(2,"pussycat");
 
     }

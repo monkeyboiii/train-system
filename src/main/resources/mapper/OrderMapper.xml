@@ -14,7 +14,7 @@
 
     <insert id="createOrderForUserId" parameterType="int">
         insert into orders (create_time, status, user_id)
-        values (now(), 'pending', #{user_id});
+        values (now(), 'opened', #{user_id});
     </insert>
 
 </mapper>

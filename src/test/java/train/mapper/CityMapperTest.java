@@ -12,7 +12,6 @@ import train.model.City;
 import train.model.Station;
 
 import java.util.Iterator;
-import java.util.List;
 
 
 @RunWith(SpringRunner.class)
@@ -26,8 +25,7 @@ public class CityMapperTest {
     @Test
     public void myCityMapperTest() {
 
-//        City city = cityMapper.queryByCode(330100);
-        City city = cityMapper.queryByName("杭州市");
+        City city = cityMapper.queryCityByName("杭州");
 
         System.out.println(city);
         Iterator iterator = city.getStations().iterator();
@@ -36,11 +34,6 @@ public class CityMapperTest {
             Station station = (Station) iterator.next();
             System.out.println(i + " : " + station);
             i++;
-        }
-
-        List<City> cities = cityMapper.queryByProvince("浙江省");
-        for (City c : cities) {
-            System.out.println(c.getCity_name() + " station.size() = " + c.getStations().size());
         }
 
     }

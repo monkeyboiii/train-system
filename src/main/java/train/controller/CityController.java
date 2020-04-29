@@ -8,25 +8,20 @@ import org.springframework.web.bind.annotation.RestController;
 import train.model.City;
 import train.service.CityService;
 
-import java.util.List;
-
+/**
+ * Returns city with its stations, and station contains trains
+ */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping
 public class CityController {
 
     @Autowired
     private CityService cityService;
 
 
-    @GetMapping("/city/{value}") // Supports code and name
-    public City queryCity(@PathVariable String value) {
-        return cityService.queryCity(value);
-    }
-
-
-    @GetMapping("/cities/{value}") // Cities in a province
-    public List<City> queryByProvince(@PathVariable String value) {
-        return cityService.queryByProvince(value);
+    @GetMapping("/city/{value}")
+    public City queryCityByName(@PathVariable String value) {
+        return cityService.queryCityByName(value);
     }
 
 }

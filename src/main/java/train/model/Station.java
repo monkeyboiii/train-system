@@ -11,7 +11,6 @@ import java.util.List;
 public class Station {
     private String station_name;
     private String city_name;
-//    private String station_code; // Obsolete
 
     @Singular
     List<String> trains; // Passing stations TODO: Add concrete trains

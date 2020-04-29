@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- *
+ * Status: opened, pending, ongoing, closed
  */
 @Getter
 @Setter
@@ -20,6 +20,6 @@ public class Order {
     private Integer user_id;
 
     @Singular
-    private List<Integer> tickets;
+    private List<Integer> tickets; // TODO: Add concrete tickets
 
 }

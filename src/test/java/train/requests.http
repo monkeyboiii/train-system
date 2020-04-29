@@ -1,3 +1,11 @@
+GET localhost:8080/route/station?depart=建德&arrive=千岛湖&transit=false
+Accept: application/json
+
+###
+
+
+
+
 GET http://localhost:8080/api/v1/users/13588454691
 Accept: application/json
 

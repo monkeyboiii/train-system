@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="train.mapper.RouteMapper">
+
+    <select id="queryRouteByStation" parameterType="String" resultType="Route">
+        with t as (select r.route_id,
+                          r.train_code,
+                          r.depart_station,
+                          r.arrive_station,
+                          t.*
+                   from route r
+                            join timetable t on r.train_code = t.train_code
+                   where r.depart_station = #{depart}
+                     and r.arrive_station = #{arrive}
+                     and t.station_name in (#{depart}, #{arrive}))
+        select t1.route_id,
+               t1.depart_station,
+               t1.arrive_station,
+               t1.depart_time,
+               t2.arrive_time,
+               case (t2.arrive_day - t1.arrive_day is null)
+                   when true then
+                       case (t2.arrive_time > t1.arrive_time) when true then 0 when false then 1 end
+                   when false then t2.arrive_day - t1.arrive_day end arrive_day
+        from t t1
+                 join t t2 on t1.route_id = t2.route_id and t1.station_name != t2.station_name
+        where t1.station_name = #{depart}
+          and t2.station_name = #{arrive};
+    </select>
+
+</mapper>

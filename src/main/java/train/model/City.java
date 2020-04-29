@@ -13,12 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class City {
-    @ToString.Exclude
-    private Integer city_code;
 
     private String city_name;
-    private String province_name;
-
-    private List<Station> stations; // Names
+    private List<Station> stations;
 
 }

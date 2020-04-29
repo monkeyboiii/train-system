@@ -17,13 +17,14 @@ import java.util.List;
  * The parameter value supports username, id, phone.
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping
 public class UserController {
 
     @Autowired
     OrderService orderService;
     @Autowired
     UserService userService;
+
 
     @GetMapping("/users/{value}/orders") // See all orders
     public List<Order> queryOrder(@PathVariable String value) {

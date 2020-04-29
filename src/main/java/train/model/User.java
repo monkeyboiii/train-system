@@ -20,7 +20,7 @@ public class User {
     private String username;
     private String id; // Identity card
     private String phone;
-    private String password;
+    private String password; // TODO: Change Mybatis result
 
     private List<Integer> orders;
 

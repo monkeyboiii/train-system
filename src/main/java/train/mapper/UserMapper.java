@@ -1,5 +1,6 @@
 package train.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import train.model.User;
 
@@ -11,13 +12,14 @@ public interface UserMapper {
     /**
      * Can trace user_id using username, id or phone.
      * Map contains the relations of the key-value pair,
-     * e.g. {"key" = "username", "value" = "135****4691"}
+     * e.g. {"key" = "phone", "value" = "135****4691"}
      */
     Integer getPrimaryKey(Map<String, String> map);
 
     void insertUser(User user);
 
-    void updateUser(Integer user_id, String password);
+    void updateUser(@Param("user_id") Integer user_id,
+                    @Param("password") String password);
 
     User queryUserByUsername(String username);
 

@@ -5,10 +5,6 @@ import org.springframework.stereotype.Service;
 import train.mapper.CityMapper;
 import train.model.City;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 @Service // Should handle all the business logic
 public class CityService {
 
@@ -16,20 +12,10 @@ public class CityService {
     private CityMapper cityMapper;
 
 
-    // Return a single city
-    public City queryCity(String value) {
-        Matcher mer = Pattern.compile("^[+]?[0-9]+$").matcher(value);
-        if (mer.find())
-            return cityMapper.queryByCode(Integer.parseInt(value));
-        else
-            return cityMapper.queryByName(value);
+    public City queryCityByName(String value) {
+        if (value.endsWith("市"))
+            value = value.substring(0, value.length() - 1);
+        return cityMapper.queryCityByName(value);
     }
-
-
-    // Return cities in a province
-    public List<City> queryByProvince(String province_name) {
-        return cityMapper.queryByProvince(province_name);
-    }
-
 
 }

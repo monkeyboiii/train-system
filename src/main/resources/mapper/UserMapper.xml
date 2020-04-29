@@ -24,19 +24,19 @@
     </update>
 
     <select id="queryUserByUsername" parameterType="String" resultType="User">
-        select *
+        select username,phone
         from users
         where username = #{username};
     </select>
 
     <select id="queryUserById" parameterType="String" resultType="User">
-        select *
+        select username,phone
         from users
         where id = #{id};
     </select>
 
     <select id="queryUserByPhone" parameterType="String" resultType="User">
-        select *
+        select username,phone
         from users
         where phone = #{phone};
     </select>
