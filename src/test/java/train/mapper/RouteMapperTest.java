@@ -19,12 +19,16 @@ public class RouteMapperTest {
 
     @Test
     public void myRouteMapperTest() {
-        List<Route> routes = routeMapper.queryRouteByStation("杭州东", "北京南");
+        List<Route> routes = routeMapper.queryRouteByStation(
+                "杭州东",
+                "北京南",
+                "2020-05-21");
+
+        System.out.println("routes.size() = " + routes.size());
 
         for (Route r : routes) {
             System.out.println(r);
         }
-        System.out.println("routes.size() = " + routes.size());
 
     }
 }

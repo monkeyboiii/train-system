@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="train.mapper.TicketSetMapper">
+
+    <resultMap id="TicketSetResultMap" type="TicketSet">
+        <id property="route_id" column="route_id"/>
+        <result property="date" column="date"/>
+
+        <!--<result property="prices" column="price" javaType="map" jdbcType="double"/>
+        <result property="remains" column="remain" javaType="map" jdbcType="int"/>-->
+
+        <collection property="prices" ofType="Price"/>
+        <collection property="remains" ofType="Remain"/>
+
+    </resultMap>
+
+
+    <select id="queryTicketSetByRouteIdAndDate" resultMap="TicketSetResultMap">
+        select rp.route_id    route_id,
+               ts.ticket_date date,
+               rp.seat_type   seat_type,
+               rp.price       price,
+               ts.remain      remain
+        from ticket_set ts
+                 join route_price rp on ts.rp_id = rp.rp_id
+        where rp.route_id = #{route_id}
+          and ts.ticket_date = #{date}::date;
+    </select>
+
+</mapper>

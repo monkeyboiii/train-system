@@ -1,9 +1,13 @@
 package train.mapper;
 
-import java.util.List;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+import train.model.TicketSet;
 
+@Repository
 public interface TicketSetMapper {
 
-    List<Integer> queryRemainTicketByRouteID(Integer route_id);
+    TicketSet queryTicketSetByRouteIdAndDate(@Param("route_id") Integer route_id,
+                                             @Param("date") String date);
 
 }

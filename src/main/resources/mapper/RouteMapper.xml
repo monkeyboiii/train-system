@@ -4,9 +4,30 @@
 
 <mapper namespace="train.mapper.RouteMapper">
 
-    <select id="queryRouteByStation" parameterType="String" resultType="Route">
+    <resultMap id="RouteResultMap" type="Route">
+
+        <id property="route_id" column="route_id"/>
+        <result property="train_code" column="train_code"/>
+        <result property="depart_station" column="depart_station"/>
+        <result property="depart_time" column="depart_time"/>
+        <result property="depart_order" column="depart_order"/>
+
+        <result property="arrive_station" column="arrive_station"/>
+        <result property="arrive_time" column="arrive_time"/>
+        <result property="arrive_order" column="arrive_order"/>
+
+
+        <!--column passes params, every route has its corresponding ticketSet-->
+        <association property="ticketSet"
+                     column="{route_id=route_id,date=date}"
+                     select="train.mapper.TicketSetMapper.queryTicketSetByRouteIdAndDate">
+        </association>
+
+    </resultMap>
+
+
+    <select id="queryRouteByStation" resultMap="RouteResultMap">
         with t as (select r.route_id,
-                          r.train_code,
                           r.depart_station,
                           r.arrive_station,
                           t.*
@@ -15,19 +36,90 @@
                    where r.depart_station = #{depart}
                      and r.arrive_station = #{arrive}
                      and t.station_name in (#{depart}, #{arrive}))
-        select t1.route_id,
-               t1.depart_station,
-               t1.arrive_station,
-               t1.depart_time,
-               t2.arrive_time,
+        select t1.route_id                                           route_id,
+               t1.train_code                                         train_code,
+               t1.depart_station                                     depart_station,
+               t1.depart_time                                        depart_time,
+               case (t1.depart_time is null)
+                   when true then '始'
+                   when false then '过' end                           depart_order,
+               t2.arrive_station                                     arrive_station,
+               t2.arrive_time                                        arrive_time,
+               case (t2.arrive_time is null)
+                   when true then '过'
+                   when false then '终' end                           arrive_order,
                case (t2.arrive_day - t1.arrive_day is null)
-                   when true then
-                       case (t2.arrive_time > t1.arrive_time) when true then 0 when false then 1 end
-                   when false then t2.arrive_day - t1.arrive_day end arrive_day
+                   when true then 0
+                   when false then t2.arrive_day - t1.arrive_day end arrive_day,
+               cast(#{date} as varchar)                              date
         from t t1
                  join t t2 on t1.route_id = t2.route_id and t1.station_name != t2.station_name
         where t1.station_name = #{depart}
           and t2.station_name = #{arrive};
+    </select>
+
+
+    <resultMap id="TransitRouteResultMap" type="TransitRoute">
+
+        <id property="route_id" column="route_id"/>
+        <result property="train_code" column="train_code"/>
+        <result property="depart_station" column="depart_station"/>
+        <result property="depart_time" column="depart_time"/>
+        <result property="depart_order" column="depart_order"/>
+
+        <result property="arrive_station" column="arrive_station"/>
+        <result property="arrive_time" column="arrive_time"/>
+        <result property="arrive_order" column="arrive_order"/>
+
+        <result property="transit_train_code" column="transit_train_code"/>
+        <result property="transit_station" column="transit_station"/>
+        <result property="transit_time" column="transit_time"/>
+
+
+        <association property="ticketSet"
+                     column="{route_id=route_id,date=date}"
+                     select="train.mapper.TicketSetMapper.queryTicketSetByRouteIdAndDate">
+        </association>
+
+    </resultMap>
+
+
+    <select id="queryTransitRouteByStation" resultType="TransitRoute">
+        select a.train_code                train_code,
+               a.depart_station            depart_station,
+               b.arrive_station            arrive_station,
+               a.depart_time               depart_time,
+               b.arrive_time               arrive_time,
+               a.arrive_day + b.arrive_day arrive_day,
+               b.train_code                transit_train_code,
+               b.depart_station            transit_station,
+               b.depart_time               transit_time
+        from (select a1.train_code                         train_code,
+                     a1.depart_station                     depart_station,
+                     a1.arrive_station                     arrive_station,
+                     a2.depart_time                        depart_time,
+                     a3.arrive_time                        arrive_time,
+                     case (a3.arrive_day is null)
+                         when true then 0
+                         when false then a3.arrive_day end arrive_day
+              from (select * from route where depart_station = #{depart}) a1
+                       join timetable a2 on a1.train_code = a2.train_code and a1.depart_station = a2.station_name
+                       join timetable a3 on a1.train_code = a3.train_code and a1.arrive_station = a3.station_name) a
+                 join (select b1.train_code                         train_code,
+                              b1.depart_station                     depart_station,
+                              b1.arrive_station                     arrive_station,
+                              b2.depart_time                        depart_time,
+                              b3.arrive_time                        arrive_time,
+                              case (b3.arrive_day is null)
+                                  when true then 0
+                                  when false then b3.arrive_day end arrive_day
+                       from (select * from route where arrive_station = #{arrive}) b1
+                                join timetable b2
+                                     on b1.train_code = b2.train_code and b1.depart_station = b2.station_name
+                                join timetable b3
+                                     on b1.train_code = b3.train_code and b1.arrive_station = b3.station_name) b
+                      on a.arrive_station = b.depart_station and
+                         b.depart_time - a.arrive_time between '0:20' and '2:00';
     </select>
 
 </mapper>

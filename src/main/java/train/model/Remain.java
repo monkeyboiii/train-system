@@ -4,11 +4,11 @@ import lombok.*;
 
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Station {
-    private String station_name;
-    private String city_name;
-
+@ToString
+public class Remain {
+    private String seat_type;
+    private Integer remain;
 }
+

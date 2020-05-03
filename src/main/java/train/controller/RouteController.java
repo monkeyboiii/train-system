@@ -28,23 +28,23 @@ public class RouteController {
 
     @GetMapping("/route/city")
     public List<Route> queryRouteByCity(@RequestParam("depart") String depart,
-                                        @RequestParam("arrive") String arrive) {
+                                        @RequestParam("arrive") String arrive,
+                                        @RequestParam("date") String date) {
         City departure = cityService.queryCityByName(depart);
         City arrival = cityService.queryCityByName(arrive);
-        if (departure == null || arrival == null)
-            return Collections.emptyList();
+
+        if (departure == null || arrival == null) return Collections.emptyList();
 
         List<Route> ans = new ArrayList<>();
         for (Station dep : departure.getStations()) {
             for (Station arr : arrival.getStations()) {
-                List<Route> routes = routeService.
-                        queryRouteByStation(dep.getStation_name(),
-                                arr.getStation_name());
-                if (!routes.isEmpty()) {
-                    ans.addAll(routes);
-                }
+
+                List<Route> routes = routeService.queryRouteByStation(dep.getStation_name(), arr.getStation_name(), date);
+                if (!routes.isEmpty()) ans.addAll(routes);
+
             }
         }
+
         return ans;
     }
 
@@ -52,10 +52,11 @@ public class RouteController {
     @GetMapping("/route/station")
     public List<?> queryRouteByStation(@RequestParam("depart") String depart,
                                        @RequestParam("arrive") String arrive,
-                                       @RequestParam("transit") Boolean transit) {
+                                       @RequestParam("date") String date,
+                                       @RequestParam(value = "transit", defaultValue = "false") Boolean transit) {
         if (!transit)
-            return routeService.queryRouteByStation(depart, arrive);
-         else
-            return routeService.queryTransitRouteByStation(depart, arrive);
+            return routeService.queryRouteByStation(depart, arrive, date);
+        else
+            return routeService.queryTransitRouteByStation(depart, arrive, date);
     }
 }

@@ -9,7 +9,7 @@ import train.model.City;
 import train.service.CityService;
 
 /**
- * Returns city with its stations, and station contains trains
+ * Returns city with its stations
  */
 @RestController
 @RequestMapping

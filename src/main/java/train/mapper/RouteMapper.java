@@ -11,10 +11,13 @@ import java.util.List;
 public interface RouteMapper {
 
     List<Route> queryRouteByStation(@Param("depart") String depart,
-                                    @Param("arrive") String arrive);
+                                    @Param("arrive") String arrive,
+                                    @Param("date") String date);
 
     // TODO
     List<TransitRoute> queryTransitRouteByStation(@Param("depart") String depart,
-                                                  @Param("arrive") String arrive);
+                                                  @Param("arrive") String arrive,
+                                                  @Param("date") String date
+    );
 
 }

@@ -9,19 +9,17 @@ public class StationTest {
 
     @Test
     public void StationModelTest(){
-        Station station= Station.builder().build();
+        Station station=new Station();
         System.out.println(station);
 
-        System.out.println(Station.builder().toString());
 
         List<String> trains=new ArrayList<>();
         trains.add("G234");
         trains.add("G232");
         trains.add("G231");
 
-        Station station1= Station.builder().station_name("hangzhou").trains(trains).build();
 
-        System.out.println(station1);
+        System.out.println(station);
 
 
     }

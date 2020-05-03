@@ -16,14 +16,13 @@ public class RouteService {
     RouteMapper routeMapper;
 
 
-    public List<Route> queryRouteByStation(String depart, String arrive) {
-        return routeMapper.queryRouteByStation(depart, arrive);
+    public List<Route> queryRouteByStation(String depart, String arrive, String date) {
+        return routeMapper.queryRouteByStation(depart, arrive, date);
     }
 
 
-
-    public List<TransitRoute> queryTransitRouteByStation(String depart, String arrive) {
-        return routeMapper.queryTransitRouteByStation(depart, arrive);
+    public List<TransitRoute> queryTransitRouteByStation(String depart, String arrive,String date) {
+        return routeMapper.queryTransitRouteByStation(depart, arrive,date);
     }
 
 

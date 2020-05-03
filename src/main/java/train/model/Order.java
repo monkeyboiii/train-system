@@ -20,6 +20,6 @@ public class Order {
     private Integer user_id;
 
     @Singular
-    private List<Integer> tickets; // TODO: Add concrete tickets
+    private List<Ticket> tickets;
 
 }

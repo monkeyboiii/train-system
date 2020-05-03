@@ -10,6 +10,6 @@ import train.model.City;
 @Repository
 public interface CityMapper {
 
-    City queryCityByName(String city_name); // TODO: Change table name in database
+    City queryCityByName(String city_name);
 
 }

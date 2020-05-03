@@ -1,12 +1,23 @@
 package train.model;
 
-import java.util.Date;
-import java.util.Map;
+import lombok.*;
 
+import java.util.Date;
+import java.util.List;
+
+
+@Setter
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class TicketSet {
-    private String ticket_set_id;
+
     private String route_id;
     private Date date;
-    private Map<String, Double> price; // According to seat_type
-    private Map<String, Integer> remain;
+    private List<Price> prices;
+    private List<Remain> remains;
+//    private Map<String, Double> prices;
+//    private Map<String, Integer> remains;
+
 }

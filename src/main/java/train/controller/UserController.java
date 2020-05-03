@@ -3,16 +3,12 @@ package train.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import train.model.Order;
 import train.model.User;
-import train.service.OrderService;
 import train.service.UserService;
-
-import java.util.List;
 
 /**
  * Controls the behavior of a client's user-requests,
- * including basic user-related CRUD, plus create/modify/delete orders.
+ * including basic user-related CRUD.
  * <p>
  * The parameter value supports username, id, phone.
  */
@@ -21,23 +17,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    OrderService orderService;
-    @Autowired
     UserService userService;
-
-
-    @GetMapping("/users/{value}/orders") // See all orders
-    public List<Order> queryOrder(@PathVariable String value) {
-        Integer user_id = userService.getUserId(value);
-        return orderService.queryOrdersByUserId(user_id);
-    }
-
-
-    @PutMapping("/users/{value}/orders") // Generate order
-    public int createOrder(@PathVariable String value) {
-        Integer user_id = userService.getUserId(value);
-        return orderService.createOrderForUserId(user_id);
-    }
 
 
     @PutMapping("/users")

@@ -7,10 +7,8 @@
     <resultMap id="CityResultMap" type="City">
 
         <id property="city_name" column="city_name"/>
+        <collection property="stations" ofType="Station"/>
 
-        <collection property="stations" ofType="Station">
-            <!--select="train.mapper.StationMapper.queryStationByCityCode">-->
-        </collection>
     </resultMap>
 
 
