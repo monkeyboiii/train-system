@@ -59,6 +59,7 @@
     </select>
 
 
+    <!--TODO: Transit result, performance problem-->
     <resultMap id="TransitRouteResultMap" type="TransitRoute">
 
         <id property="route_id" column="route_id"/>

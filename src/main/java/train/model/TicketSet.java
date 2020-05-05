@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class TicketSet {
 
+    private Integer ticket_set_id;
     private String route_id;
     private Date date;
     private List<Price> prices;

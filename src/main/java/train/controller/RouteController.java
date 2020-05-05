@@ -2,10 +2,7 @@ package train.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import train.model.City;
 import train.model.Station;
 import train.model.Route;
@@ -16,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+/**
+ * Bundled route page
+ */
 @RestController
 @RequestMapping
 public class RouteController {
@@ -59,4 +60,11 @@ public class RouteController {
         else
             return routeService.queryTransitRouteByStation(depart, arrive, date);
     }
+
+
+    @GetMapping("/city/{value}")
+    public City queryCityByName(@PathVariable String value) {
+        return cityService.queryCityByName(value);
+    }
+
 }

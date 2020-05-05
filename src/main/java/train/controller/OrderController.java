@@ -35,17 +35,11 @@ public class OrderController {
 
 
     @GetMapping("/orders/{value}")
-    public List<Order> queryOrder(@PathVariable String value) {
+    public List<Order> queryOrder(@PathVariable String value,
+                                  @RequestParam(value = "status", defaultValue = "all") String status) {
         Integer user_id = userService.getUserId(value);
         if (user_id == null) return Collections.emptyList();
-        return orderService.queryOrdersByUserId(user_id);
+        return orderService.queryOrdersByUserId(user_id, status.toLowerCase());
     }
-
-
-    /*@GetMapping("/orders/{value}")
-    public List<Order> queryPendingOrder(@PathVariable String value) {
-        return Collections.EMPTY_LIST;
-    }*/
-
 
 }

@@ -7,7 +7,8 @@ import train.model.User;
 import train.service.UserService;
 
 /**
- * Controls the behavior of a client's user-requests,
+ * Inside the User page:
+ * controls the behavior of a client's user-requests,
  * including basic user-related CRUD.
  * <p>
  * The parameter value supports username, id, phone.

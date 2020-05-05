@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import train.mapper.CityMapper;
 import train.model.City;
 
-@Service // Should handle all the business logic
+@Service
 public class CityService {
 
     @Autowired

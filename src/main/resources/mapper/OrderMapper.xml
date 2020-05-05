@@ -6,15 +6,77 @@
 <mapper namespace="train.mapper.OrderMapper">
 
 
-    <select id="queryOrdersByUserId" parameterType="int" resultType="Order">
-        select *
-        from orders
-        where user_id = #{user_id};
+    <resultMap id="OrderResultMap" type="Order">
+        <id property="order_id" column="order_id"/>
+        <result property="create_time" column="create_time"/>
+        <result property="status" column="status"/>
+        <result property="user_id" column="user_id"/>
+
+        <collection property="tickets" ofType="Ticket" column="order_id"
+                    select="train.mapper.TicketMapper.queryTicketByOrderId"/>
+
+    </resultMap>
+
+
+    <select id="queryOrdersByUserId" resultMap="OrderResultMap">
+        select order_id,
+        create_time,
+        status,
+        o.user_id,
+        username creator_name
+        from orders o
+        join users u on u.user_id = o.user_id
+        where o.user_id = #{user_id}
+        <if test="'pending' == status">and status = 'pending'</if>
+        <if test="'ongoing' == status">and status = 'ongoing'</if>
+        <if test="'finished' == status">and status = 'finished'</if>
+        <if test="'closed' == status">and status = 'closed'</if>
+        ;
     </select>
 
-    <insert id="createOrderForUserId" parameterType="int">
-        insert into orders (create_time, status, user_id)
-        values (now(), 'opened', #{user_id});
-    </insert>
+
+    <select id="queryOrdersByOrderId" resultMap="OrderResultMap">
+        select order_id,
+               create_time,
+               status,
+               o.user_id,
+               username creator_name
+        from orders o
+                 join users u on u.user_id = o.user_id
+        where o.order_id = #{order_id};
+    </select>
+
+
+    <select id="bookTicketWithNewOrder" resultType="int">
+        select book_with_new_order(#{passenger_id},
+                                   #{ticket_set_id});
+    </select>
+
+
+    <select id="bookTicketWithOrder" resultType="int">
+        select book_with_order(#{passenger_id},
+                               #{ticket_set_id},
+                               #{order_id});
+    </select>
+
+
+    <select id="secureOrderByOrderId" resultMap="OrderResultMap">
+        select order_id,
+               create_time,
+               status,
+               user_id,
+               creator_name
+        from secure_order_by_order_id(#{order_id});
+    </select>
+
+
+    <select id="refundOrderByOrderId" resultMap="OrderResultMap">
+        select order_id,
+               create_time,
+               status,
+               user_id,
+               creator_name
+        from refund_order_by_order_id(#{order_id});
+    </select>
 
 </mapper>

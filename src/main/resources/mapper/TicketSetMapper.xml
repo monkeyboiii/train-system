@@ -6,7 +6,8 @@
 <mapper namespace="train.mapper.TicketSetMapper">
 
     <resultMap id="TicketSetResultMap" type="TicketSet">
-        <id property="route_id" column="route_id"/>
+        <id property="ticket_set_id" column="ticket_set_id"/>
+        <result property="route_id" column="route_id"/>
         <result property="date" column="date"/>
 
         <!--<result property="prices" column="price" javaType="map" jdbcType="double"/>
@@ -19,11 +20,12 @@
 
 
     <select id="queryTicketSetByRouteIdAndDate" resultMap="TicketSetResultMap">
-        select rp.route_id    route_id,
-               ts.ticket_date date,
-               rp.seat_type   seat_type,
-               rp.price       price,
-               ts.remain      remain
+        select ts.ticket_set_id tiecket_set_id,
+               rp.route_id      route_id,
+               ts.ticket_date   date,
+               rp.seat_type     seat_type,
+               rp.price         price,
+               ts.remain        remain
         from ticket_set ts
                  join route_price rp on ts.rp_id = rp.rp_id
         where rp.route_id = #{route_id}
