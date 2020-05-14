@@ -14,7 +14,6 @@ public interface RouteMapper {
                                     @Param("arrive") String arrive,
                                     @Param("date") String date);
 
-    // TODO
     List<TransitRoute> queryTransitRouteByStation(@Param("depart") String depart,
                                                   @Param("arrive") String arrive,
                                                   @Param("date") String date

@@ -22,13 +22,12 @@ public class TicketSetMapperTest {
         String a = Date.valueOf("2020-05-21").toString();
         System.out.println(a);
 
-        TicketSet ticketSet = ticketSetMapper.queryTicketSetByRouteIdAndDate(1234, Date.valueOf("2020-05-21").toString());
+        TicketSet ticketSet = ticketSetMapper.queryTicketSetByRouteIdAndDate(1234, a);
 
 //        TicketSet ticketSet = ticketSetMapper.queryTicketSetByRouteIdAndDate(1234);
 
         System.out.println(ticketSet);
-        System.out.println("ticketSet.getPrices() = " + ticketSet.getPrices());
-        System.out.println("ticketSet.getRemains()() = " + ticketSet.getRemains());
+        System.out.println("ticketSet.getPrices() = " + ticketSet.getTicketTypes());
 
     }
 }

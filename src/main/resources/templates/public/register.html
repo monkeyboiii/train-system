@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+
+    <script th:src="@{/js/jquery.min.js}"></script>
+
+
+</head>
+<body>
+
+<h1>注册</h1>
+
+<div id="block">
+    <form>
+        <label> 用户名：</label>
+        <input type="text" id="username" required="required"/><br><br>
+        <label> 身份证：</label>
+        <input type="text" id="identity"/><br><br>
+        <label> 手机：</label>
+        <input type="text" id="phone"/><br><br>
+        <label> 密码：</label>
+        <input type="password" id="password"/><br><br>
+        <label> 确认密码：</label>
+        <input type="password" id="passwordTwo"/><br><br>
+
+        <label> 请选择角色：</label>
+        <select id="credit">
+            <option value="user">用户</option>
+            <option value="admin">管理</option>
+            <option value="tester">测试</option>
+        </select><br><br>
+
+    </form>
+
+    <button onclick="register()">注册</button>
+    <br>
+    <button onclick="window.location.href='/login'">返回</button>
+</div>
+
+</body>
+
+<script>
+    function register() {
+        const username = $("#username").val();
+        const identity = $("#identity").val();
+        const phone = $("#phone").val();
+        const password1 = $("#password").val();
+        const password2 = $("#passwordTwo").val();
+        const credit = $("#credit").val();
+
+        if (!(username && identity && phone)) {
+            alert("请填写所有字段！");
+            return;
+        }
+
+        if (password1 === password2) {
+            $.post("/register", {
+                username: username,
+                identity: identity,
+                phone: phone,
+                password: password1,
+                credit: credit
+            }, function (res) {
+                if (res == 1) {
+                    alert("注册成功");
+                    window.location.href = "/login";
+                    // window.location.href = "/";
+                } else {
+                    alert("注册失败，请检查数据重试");
+                }
+            })
+        } else {
+            alert("两次密码不一致！");
+        }
+    }
+</script>
+
+</html>

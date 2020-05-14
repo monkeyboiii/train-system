@@ -25,6 +25,7 @@ public class Route {
     protected Time arrive_time;
     protected String arrive_order; // 过/终
 
+
     protected Integer arrive_day;
 
 

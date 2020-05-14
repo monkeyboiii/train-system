@@ -46,7 +46,7 @@ public class UserTest {
         orders.add(24);
         orders.add(22);
         orders.add(21);
-        User user1 = new User("AS", "234", "17488547391", "pass",orders);
+        User user1 = new User("AS", "234", "17488547391", "pass", "u", orders);
 
         System.out.println(user);
         System.out.println(user1);

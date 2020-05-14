@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.4.1/css/css/bootstrap.min.css}"
+          rel="stylesheet"/>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
+
+</head>
+<body>
+
+<h1>登入</h1>
+
+<div id="block">
+    <form action="/login" method="post">
+        <label>账号</label>
+        <input type="text" placeholder="身份证/手机/用户名" required="required" id="value"><br>
+        <label>密码</label>
+        <input type="password" placeholder="******" required="required" id="password"><br>
+        <select type="text" id="credit">
+            <option value="u">用户</option>
+            <option value="a">管理</option>
+            <option value="t">测试</option>
+        </select><br>
+        <input onclick="login()" type="submit" value="登录"><br>
+    </form>
+
+    <a href="/register">没有账号？注册</a>
+</div>
+
+
+<script>
+    function login() {
+        const value = $("#value").val();
+        const password = $("#password").val();
+        const credit = $("#credit").val();
+
+        if (!(value && password)) {
+            alert("请填写所有字段！");
+            return;
+        }
+
+
+        $.post("/login", {
+            value: value,
+            password: password,
+            credit: credit
+        }, function (res) {
+            if (res.substr(0, 1) === 'r') {
+                alert("登录成功");
+                window.location.href =
+                    "/order?username="
+                    + res.substr(2)
+                    + "&credit="
+                    + res.substr(1, 1);
+            } else {
+                alert(res);
+                window.location.href = '/login';
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>

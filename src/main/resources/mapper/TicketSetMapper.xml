@@ -6,23 +6,25 @@
 <mapper namespace="train.mapper.TicketSetMapper">
 
     <resultMap id="TicketSetResultMap" type="TicketSet">
-        <id property="ticket_set_id" column="ticket_set_id"/>
-        <result property="route_id" column="route_id"/>
+
+        <!--Unique route_id by query from routeMapper-->
+        <id property="route_id" column="route_id"/>
         <result property="date" column="date"/>
 
-        <!--<result property="prices" column="price" javaType="map" jdbcType="double"/>
-        <result property="remains" column="remain" javaType="map" jdbcType="int"/>-->
-
-        <collection property="prices" ofType="Price"/>
-        <collection property="remains" ofType="Remain"/>
+        <collection property="ticketTypes" ofType="TicketType">
+            <id property="ticket_set_id" column="ticket_set_id"/>
+            <result property="seat_type" column="seat_type"/>
+            <result property="price" column="price"/>
+            <result property="remain" column="remain"/>
+        </collection>
 
     </resultMap>
 
 
     <select id="queryTicketSetByRouteIdAndDate" resultMap="TicketSetResultMap">
-        select ts.ticket_set_id tiecket_set_id,
-               rp.route_id      route_id,
+        select rp.route_id      route_id,
                ts.ticket_date   date,
+               ts.ticket_set_id ticket_set_id,
                rp.seat_type     seat_type,
                rp.price         price,
                ts.remain        remain

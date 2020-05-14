@@ -59,11 +59,13 @@
     </select>
 
 
-    <!--TODO: Transit result, performance problem-->
     <resultMap id="TransitRouteResultMap" type="TransitRoute">
 
+
+        <!--1. First train ride from start to transit station-->
         <id property="route_id" column="route_id"/>
         <result property="train_code" column="train_code"/>
+
         <result property="depart_station" column="depart_station"/>
         <result property="depart_time" column="depart_time"/>
         <result property="depart_order" column="depart_order"/>
@@ -72,12 +74,33 @@
         <result property="arrive_time" column="arrive_time"/>
         <result property="arrive_order" column="arrive_order"/>
 
+        <result property="arrive_day" column="arrive_day"/>
+
+
+        <!--2. Second train ride from transit station to destination-->
+        <result property="transit_route_id" column="transit_route_id"/>
         <result property="transit_train_code" column="transit_train_code"/>
-        <result property="transit_station" column="transit_station"/>
-        <result property="transit_time" column="transit_time"/>
+
+        <result property="transit_depart_station" column="transit_depart_station"/>
+        <result property="transit_depart_time" column="transit_depart_time"/>
+        <result property="transit_depart_order" column="transit_depart_order"/>
+
+        <result property="transit_arrive_station" column="transit_arrive_station"/>
+        <result property="transit_arrive_time" column="transit_arrive_time"/>
+        <result property="transit_arrive_order" column="transit_arrive_order"/>
+
+        <result property="transit_arrive_day" column="transit_arrive_day"/>
 
 
+        <!--1.-->
         <association property="ticketSet"
+                     column="{route_id=route_id,date=date}"
+                     select="train.mapper.TicketSetMapper.queryTicketSetByRouteIdAndDate">
+        </association>
+
+
+        <!--2.-->
+        <association property="transit_ticketSet"
                      column="{route_id=route_id,date=date}"
                      select="train.mapper.TicketSetMapper.queryTicketSetByRouteIdAndDate">
         </association>
@@ -85,7 +108,31 @@
     </resultMap>
 
 
-    <select id="queryTransitRouteByStation" resultType="TransitRoute">
+    <!--TODO-->
+    <select id="queryTransitRouteByStation" resultMap="TransitRouteResultMap">
+        select route_id,
+               train_code,
+               depart_station,
+               depart_time,
+               depart_order,
+               arrive_station,
+               arrive_time,
+               arrive_order,
+               arrive_day,
+               transit_route_id,
+               transit_train_code,
+               transit_depart_station,
+               transit_depart_order,
+               transit_depart_time,
+               transit_arrive_station,
+               transit_arrive_order,
+               transit_arrive_time,
+               transit_arrive_day,
+               cast(#{date} as varchar) date
+        from transit_route_query(#{depart}, #{arrive});
+    </select>
+
+    <!--<select id="queryTransitRouteByStation" resultType="TransitRoute">
         select a.train_code                train_code,
                a.depart_station            depart_station,
                b.arrive_station            arrive_station,
@@ -119,8 +166,10 @@
                                      on b1.train_code = b2.train_code and b1.depart_station = b2.station_name
                                 join timetable b3
                                      on b1.train_code = b3.train_code and b1.arrive_station = b3.station_name) b
-                      on a.arrive_station = b.depart_station and
-                         b.depart_time - a.arrive_time between '0:20' and '2:00';
-    </select>
+                      on a.arrive_station = b.depart_station and b.depart_time - a.arrive_time > '0:20'
+        order by EXTRACT(Epoch from
+                         (b.arrive_time - a.arrive_time + cast((a.arrive_day + b.arrive_day || 'days') as interval)))
+        limit 30;
+    </select>-->
 
 </mapper>

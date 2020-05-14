@@ -5,6 +5,10 @@
 
 <mapper namespace="train.mapper.UserMapper">
 
+    <sql id="allFields">
+        username, id, phone, password, credit
+    </sql>
+
     <select id="getPrimaryKey" parameterType="java.util.Map" resultType="int">
         select user_id
         from users
@@ -13,8 +17,8 @@
     </select>
 
     <insert id="insertUser" parameterType="User">
-        insert into users (username, id, phone, password)
-        values (#{username}, #{id}, #{phone}, #{password});
+        insert into users (username, id, phone, password, credit)
+        values (#{username}, #{id}, #{phone}, #{password}, #{credit});
     </insert>
 
     <update id="updateUser">
@@ -24,19 +28,22 @@
     </update>
 
     <select id="queryUserByUsername" parameterType="String" resultType="User">
-        select username,id,phone,password
+        select
+        <include refid="allFields"/>
         from users
         where username = #{username};
     </select>
 
     <select id="queryUserById" parameterType="String" resultType="User">
-        select username,id,phone,password
+        select
+        <include refid="allFields"/>
         from users
         where id = #{id};
     </select>
 
     <select id="queryUserByPhone" parameterType="String" resultType="User">
-        select username,id,phone,password
+        select
+        <include refid="allFields"/>
         from users
         where phone = #{phone};
     </select>

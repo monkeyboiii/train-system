@@ -62,8 +62,7 @@ public class UserService {
 
     public int deleteUser(String value) {
         Integer user_id = getUserId(value);
-        if (user_id == null)
-            return 0;
+        if (user_id == null) return 0;
         userMapper.deleteUser(user_id);
         return 1;
     }

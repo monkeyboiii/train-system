@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Order</title>
+</head>
+<body>
+
+<h1>订单</h1>
+
+<span id="welcome">
+    Welcome, <label th:text="${role}"></label> <label th:text="${username}"></label>!
+</span>
+
+<div id="filters">
+    <form method="get">
+        <label>查询日期
+            <input type="date">
+        </label><br>
+        <label>类型
+            <select>
+                <option value="all">全部</option>
+                <option value="pending">待付款</option>
+                <option value="finished">已完成</option>
+                <option value="ongoing">进行中</option>
+                <option value="refunded">已退款</option>
+            </select>
+        </label><br>
+    </form>
+</div>
+
+
+<table>
+    <thead>
+    <tr>
+        <th>a</th>
+        <th>b</th>
+        <th>c</th>
+        <th>d</th>
+        <th>e</th>
+    </tr>
+    </thead>
+
+
+    <tbody>
+    <tr>
+        <td> gos</td>
+        <td> gas</td>
+        <td> ges</td>
+        <td> gis</td>
+        <td> gus</td>
+    </tr>
+    </tbody>
+
+</table>
+
+</body>
+</html>

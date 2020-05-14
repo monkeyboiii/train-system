@@ -20,16 +20,29 @@ public class User {
     private String username;
     private String id; // Identity card
     private String phone;
-    private String password; // TODO: Change Mybatis result
+    private String password;
+    private String credit;
 
     private List<Integer> orders;
 
-    // Use when insert
+
+    /**
+     * Use when inserting
+     */
+    public User(String username, String id, String phone, String password, String credit) {
+        this.username = username;
+        this.id = id;
+        this.phone = phone;
+        this.password = password;
+        this.credit = credit.substring(0, 1).toLowerCase();
+    }
+
     public User(String username, String id, String phone, String password) {
         this.username = username;
         this.id = id;
         this.phone = phone;
         this.password = password;
+        this.credit = "u";
     }
 
 
@@ -40,7 +53,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "username= '" + username + '\'' +
-                ", phone= '" + phone.substring(0, 3) + "*****" + phone.substring(7, 11) + '\'' +
+                ", phone= '" + phone.substring(0, 3) + "*****" + phone.substring(phone.length() - 3) + '\'' +
                 ",total orders= " + (orders == null ? "0" : orders.size()) +
                 '}';
     }

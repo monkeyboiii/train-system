@@ -21,15 +21,12 @@ public class TransitRouteMapperTest {
     public void myTransitRouteMapperTest() {
 
         List<TransitRoute> transitRoutes = routeMapper.
-                queryTransitRouteByStation(
-                        "北京南",
-                        "上海虹桥",
-                        "2020-05-21");
+                queryTransitRouteByStation("玉林", "吐鲁番", "2020-05-21");
 
         System.out.println("transitRoutes.size() = " + transitRoutes.size());
 
         for (TransitRoute t : transitRoutes) {
-            System.out.println("t.getTransit_station() = " + t.getTransit_station());
+            System.out.println("t.getTransit_ticketSet() = " + t.getTransit_ticketSet());
         }
 
     }

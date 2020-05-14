@@ -23,4 +23,24 @@ public class Order {
     @Singular
     private List<Ticket> tickets;
 
+
+    private void translateStatus() {
+        switch (this.status) {
+            case "pending":
+                this.status = "待付款";
+                break;
+            case "ongoing":
+                this.status = "进行中";
+                break;
+            case "finished":
+                this.status = "已完成";
+                break;
+            case "closed":
+                this.status = "已退款";
+                break;
+            default:
+                this.status = "未知";
+        }
+    }
+
 }

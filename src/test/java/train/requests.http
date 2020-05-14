@@ -1,3 +1,7 @@
+GET http://localhost:8080/route/station?depart=西安北&arrive=杭州东&date=2020-05-21
+Accept: application/json
+
+###
 GET localhost:8080/route/station?depart=建德&arrive=千岛湖&transit=false
 Accept: application/json
 
