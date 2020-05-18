@@ -67,7 +67,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id.equals(user.id) || phone.equals(user.phone);
+        return username.equals(user.username) || id.equals(user.id) || phone.equals(user.phone);
     }
 
 

@@ -15,7 +15,9 @@ public class OrderService {
     OrderMapper orderMapper;
 
     public List<Order> queryOrdersByUserId(Integer user_id, String status) {
-        return orderMapper.queryOrdersByUserId(user_id, status);
+        List<Order> orders = orderMapper.queryOrdersByUserId(user_id, status);
+        for (Order o : orders) o.translateStatus();
+        return orders;
     }
 
     public Integer bookTicketWithNewOrder(Integer passenger_id, Integer ticket_set_id) {
@@ -36,8 +38,8 @@ public class OrderService {
      */
     public Order refundOrderByOrderId(Integer order_id) {
         Order order = orderMapper.queryOrdersByOrderId(order_id);
-        if (order.getStatus().equals("finished")) {
-            return null; // TODO: Alter exception handling
+        if (order.getStatus().equals("finished") || order.getStatus().equals("refunded")) {
+            return Order.builder().order_id(-1).build();
         }
         return orderMapper.refundOrderByOrderId(order_id);
     }

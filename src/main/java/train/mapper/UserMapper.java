@@ -29,4 +29,15 @@ public interface UserMapper {
 
     void deleteUser(Integer user_id);
 
+    void postTokenByUsername(@Param("username") String username,
+                             @Param("token") String token);
+
+    Integer confirmTokenByUsername(@Param("username") String username,
+                                   @Param("token") String token);
+
+    Integer assignCreditByUserId(@Param("user_id") Integer user_id,
+                                 @Param("credit") String credit);
+
+    void cleanTokenByUsername(String username);
+
 }

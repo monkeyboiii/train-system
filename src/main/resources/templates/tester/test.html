@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Tests</title>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.4.1/css/bootstrap.min.css}"
+          rel="stylesheet"/>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
+</head>
+<body>
+
+<div align="center" style="margin-bottom: 3%">
+    <h1>订单与票</h1>
+    <span class="shadow carousel-fade" id="welcome">
+        Welcome, <label id="thisRole" th:text="${role}"></label> <label id="person" th:text="${username}"></label>!
+    </span>
+    <label id="tokenStore" th:text="${token}" hidden="hidden"></label>
+    <button class="btn-light" onclick="logout()">退出</button>
+</div>
+
+
+<div align="center">
+    <div>
+        <h5>多线查询</h5>
+        <button>测试</button>
+        <div>
+
+        </div>
+
+        <h5>随机订单</h5>
+        <button>测试</button>
+        <div></div>
+
+    </div>
+</div>
+</div>
+
+
+<script>
+
+    function logout() {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/logout",
+            data: {
+                username: $("#person").text()
+            },
+            success: function (data) {
+                if (data.status == "OK") {
+                    alert(data.msg);
+                    window.location.href = "http://" + window.location.host + "/login";
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

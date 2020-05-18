@@ -20,6 +20,10 @@ public class RouteService {
         return routeMapper.queryRouteByStation(depart, arrive, date);
     }
 
+    public List<Route> queryRouteByCity(String depart, String arrive, String date) {
+        return routeMapper.queryRouteByCity(depart, arrive, date);
+    }
+
 
     public List<TransitRoute> queryTransitRouteByStation(String depart, String arrive,String date) {
         return routeMapper.queryTransitRouteByStation(depart, arrive,date);

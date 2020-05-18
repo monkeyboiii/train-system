@@ -1,31 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
+<html lang="en" xmlns:th="http://www.thymeleaaf.org/">
+
+<head th:fragment="commonHeader(title)">
     <meta charset="UTF-8">
-    <title>common</title>
+    <title th:text="${title}"></title>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
+    <style>
+        body {
+            background: rgb(250, 250, 250)
+        }
+    </style>
+
 </head>
 
 <body>
-<!--顶栏-->
-<nav th:fragment="topbar">
-    <div class="top">
-        <div align="right">
-            <button type="button" class="btn-sign" style="vertical-align:middle"><span>免费注册</span></button>
-            <button type="button" class="btn-log" style="vertical-align:middle"><span>马上登录</span></button>
+<div th:fragment="commonNav">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">订单和票</a></li>
+                <li><a href="#">路线</a></li>
+                <li><a href="#">导航三</a></li>
+                <li><a href="#">导航四</a></li>
+            </ul>
         </div>
-    </div>
-</nav>
-
-<!--底部信息展示栏-->
-<nav th:fragment="bottombar">
-    <div class="foot" style="background-color:#323232 ;margin-top: 20px;">
-        <br><br>
-        <p style="color: #C7C7C7" align="center"><span style="color: #556666;">destiny@XuRuiBiao.com</span>&nbsp;&nbsp;xiaosha
-        </p><br>
-        <p style="color:#556666" align="center" ;>NO</p><br>
-        <p style="color:#C7C7C7;" align="center">Contact:+86-</p><br>
-    </div>
-</nav>
+    </nav>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="train.mapper.TrainMapper">
+
+
+    <resultMap id="TrainResultMap" type="train.model.Train">
+        <id property="train_code" column="train_code"/>
+        <collection property="stations" ofType="train.model.Station">
+            <id property="station_name" column="station_name"/>
+            <result property="city_name" column="city_name"/>
+        </collection>
+        <collection property="arrive_times" ofType="java.sql.Time" javaType="list">
+            <result column="arrive_time"/>
+        </collection>
+        <collection property="depart_times" ofType="java.sql.Time" javaType="list">
+            <result column="depart_time"/>
+        </collection>
+    </resultMap>
+
+    <select id="queryTrainByTrainCode" parameterType="String" resultMap="TrainResultMap">
+        select t.train_code,
+               t.station_name,
+               ss.city_name,
+               coalesce(t.arrive_time, '00:00:00'::time) arrive_time,
+               coalesce(t.depart_time, '00:00:00'::time) depart_time
+        from timetable t
+                 join station_simple ss on t.station_name = ss.station_name
+        where train_code = #{train_code}
+        order by station_order;
+    </select>
+
+    <select id="addStation" resultType="string">
+        select add_station(#{train_code}, #{station_name}, #{time}::time, #{arrive_day});
+    </select>
+
+    <select id="deleteStation" resultType="string">
+        select delete_station(#{train_code}, #{station_name});
+    </select>
+
+</mapper>

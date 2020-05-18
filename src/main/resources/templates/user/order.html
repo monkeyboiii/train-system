@@ -3,56 +3,344 @@
 <head>
     <meta charset="UTF-8">
     <title>Order</title>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.4.1/css/bootstrap.min.css}"
+          rel="stylesheet"/>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
+
 </head>
+
 <body>
 
-<h1>订单</h1>
 
-<span id="welcome">
-    Welcome, <label th:text="${role}"></label> <label th:text="${username}"></label>!
-</span>
-
-<div id="filters">
-    <form method="get">
-        <label>查询日期
-            <input type="date">
-        </label><br>
-        <label>类型
-            <select>
-                <option value="all">全部</option>
-                <option value="pending">待付款</option>
-                <option value="finished">已完成</option>
-                <option value="ongoing">进行中</option>
-                <option value="refunded">已退款</option>
-            </select>
-        </label><br>
-    </form>
+<div align="center" style="margin-bottom: 3%">
+    <h1>订单与票</h1>
+    <span class="shadow carousel-fade" id="welcome">
+        Welcome, <label id="thisRole" th:text="${role}"></label> <label id="person" th:text="${username}"></label>!
+    </span>
+    <label id="tokenStore" th:text="${token}" hidden="hidden"></label>
+    <button class="btn-light" onclick="redirectToRoutePage()">路线页</button>
+    <button class="btn-light" onclick="logout()">退出</button>
 </div>
 
 
-<table>
-    <thead>
-    <tr>
-        <th>a</th>
-        <th>b</th>
-        <th>c</th>
-        <th>d</th>
-        <th>e</th>
-    </tr>
-    </thead>
+<div align="center">
+
+    <div id="filters">
+        <label for="orderStatus" class="col-form-label">类型</label>
+        <select id="orderStatus" class="custom-select w-25">
+            <option value="all">全部</option>
+            <option value="pending">待付款</option>
+            <option value="finished">已完成</option>
+            <option value="ongoing">进行中</option>
+            <option value="closed">已退款</option>
+        </select>
+
+        <button id="query" onclick="query()" class="btn-light">查询</button>
+        <button id="redirect" onclick="redirectToRoutePage()" class="btn-primary">去订票</button>
+    </div>
+
+    <div class="w-75">
+        <h4 class="font-weight-bold">订单</h4>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>订单号</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>订单总价</th>
+                <th>创建人</th>
+                <th>显示票</th>
+                <th>订单操作</th>
+            </tr>
+            <tbody id="orderTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="align-content-center w-75">
+        <h4 class="font-weight-bold">票</h4>
+
+        <table class="table table-bordered table-striped">
+
+            <tr align="center">
+                <th>订单号</th>
+                <th>车号/日期</th>
+                <th>出发</th>
+                <th>到达</th>
+                <th hidden="hidden">票号</th>
+                <th>座位类型</th>
+                <th>座位号</th>
+                <th>乘客</th>
+                <th>票价</th>
+                <th>完成/退款</th>
+                <th>票操作</th>
+            </tr>
+
+            <tbody id="ticketTable" align="center">
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
 
 
-    <tbody>
-    <tr>
-        <td> gos</td>
-        <td> gas</td>
-        <td> ges</td>
-        <td> gis</td>
-        <td> gus</td>
-    </tr>
-    </tbody>
+<script>
+    function query() {
+        let orderStatus = $("#orderStatus").val();
+        let username = $("#person").text();
+        let url = "http://" + window.location.host + "/order";
 
-</table>
+
+        $.ajax({
+            dataType: "json",
+            method: "POST",
+            url: url,
+            data: {
+                value: username,
+                status: orderStatus
+            },
+            success: function (data) {
+
+
+                if ($.isEmptyObject(data)) {
+                    alert("没有类似的订单！");
+                    return;
+                }
+
+
+                $("#orderTable").empty();
+                $("#ticketTable").empty();
+
+
+                /**
+                 * order/ticket information separation
+                 * */
+                $.each(data, function () {
+                    let tr = $("<tr align='center'/>");
+                    let order = this;
+                    let oid = this.order_id;
+
+                    $("<td/>").html(oid).appendTo(tr);
+                    $("<td/>").html(this.create_time).appendTo(tr);
+                    $("<td id='order_status_" + oid + "'/>").html(this.status).appendTo(tr);
+                    $("<td/>").html(this.price).appendTo(tr);
+                    $("<td/>").html(this.creator_name).appendTo(tr);
+                    $("<td/>").html("<button id='btn_" + oid + "' onclick='showTickets(" + oid + ")' class='btn btn-info'>SHOW</button>").appendTo(tr);
+
+
+                    if (this.status == '待付款') {
+                        $("<td/>").html("<button onclick='makePayment(" + oid + ")' class='btn btn-primary'>Pay</button>"
+                            + "&nbsp"
+                            + "<button onclick='refundOrder(" + oid + ")' class='btn btn-secondary'>REFUND</button>").appendTo(tr);
+                    } else if(this.status == '进行中'){
+                        $("<td/>").html("<button onclick='refundOrder(" + oid + ")' class='btn btn-secondary'>REFUND</button>").appendTo(tr);
+                    }else{
+                        $("<td/>").html("<button onclick='orderInfoQuery(" + oid + ")' class='btn btn-secondary'>NOPE</button>").appendTo(tr);
+                    }
+                    $("#orderTable").append(tr);
+
+
+                    $.each(this.tickets, function () {
+                        let inner = $("<tr align='center' hidden='hidden'/>");
+
+                        $("<td/>").html(oid).appendTo(inner);
+                        $("<td hidden='hidden'/>").html(this.ticket_id).appendTo(inner);
+                        $("<td/>").html(this.train_code + " / " + new Date(this.date).toDateString()).appendTo(inner);
+                        $("<td/>").html(this.depart_station +
+                            "<br>" + this.depart_time).appendTo(inner);
+                        $("<td/>").html(this.arrive_station + "<br>"
+                            + this.arrive_time
+                            + (this.arrive_day == 0 ? "" : " (+" + this.arrive_day + ")")
+                        ).appendTo(inner);
+                        $("<td/>").html(this.seat_type).appendTo(inner);
+                        $("<td/>").html(this.seat_number).appendTo(inner);
+                        $("<td/>").html(this.passenger_name).appendTo(inner);
+                        $("<td/>").html(this.price).appendTo(inner);
+                        $("<td id='ticket_status_" + this.ticket_id + "'/>").html(this.finished == true
+                            ? "已完成" :
+                            (this.refunded == true ? "已退款" : "未出发")
+                        ).appendTo(inner);
+
+                        if (!this.finished && !this.refunded && order.status == '进行中') {
+                            $("<td/>").html(
+                                "<button "
+                                + "onclick='checkTicket(" + this.ticket_id + ")'"
+                                + " class='btn btn-primary'>CHECK</button>"
+                                + "&nbsp"
+                                + "<button "
+                                + "onclick='refundTicket(" + this.ticket_id + ")'"
+                                + " class='btn btn-secondary'>REFUND</button>").appendTo(inner);
+                        } else {
+                            $("<td/>").html("<button onclick='ticketInfoQuery(" + this.ticket_id + ")' class='btn btn-secondary'>NOPE</button>").appendTo(inner);
+                        }
+
+                        $("#ticketTable").append(inner);
+                    });
+                });
+            },
+            error: function () {
+                alert("Something go wrong!");
+            }
+        });
+
+    }
+
+
+    function showTickets(oid) {
+        $("#ticketTable").find("tr").each(function () {
+            let tdArr = $(this).children();
+            if (tdArr[0].innerHTML == oid) {
+                if (this.hidden)
+                    this.removeAttribute("hidden");
+                else
+                    this.setAttribute("hidden", true);
+            }
+        });
+        let btn = document.getElementById("btn_" + oid);
+        btn.innerHTML = (btn.innerHTML == "HIDE") ? "SHOW" : "HIDE";
+    }
+
+
+    function refundOrder(oid) {
+        let conf = confirm("确认退款订单?");
+        if (!conf) {
+            return;
+        } else {
+            if (document.getElementById('order_status_' + oid).innerHTML == '已退款') {
+                alert("无法重复退款");
+                return;
+            }
+            if (document.getElementById('order_status_' + oid).innerHTML == '已完成') {
+                alert("已完成的订单无法退款");
+                return;
+            }
+
+            let url = "http://" + window.location.host + "/order/refund/" + oid;
+            $.ajax({
+                url: url,
+                method: "post",
+                success: function (data) {
+                    if (data.order_id == -1) {
+                        alert("无法退款");
+                    } else {
+                        if (document.getElementById('order_status_' + oid).innerHTML == '进行中') {
+                            alert("退款成功");
+                            document.getElementById('_' + oid).innerHTML = '已退款';
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+    function refundTicket(ticket_id) {
+        let conf = confirm("确认退款订单?");
+        if (!conf) {
+            return;
+        } else {
+            if (document.getElementById('ticket_status_' + ticket_id).innerHTML == '已退款') {
+                alert("无法重复退款");
+                return;
+            }
+            if (document.getElementById('ticket_status_' + ticket_id).innerHTML == '已完成') {
+                alert("已完成的票无法退款");
+            }
+
+            let url = "http://" + window.location.host + "/ticket/refund/" + ticket_id;
+            $.ajax({
+                    url: url,
+                    method: "post",
+                    success: function (data) {
+                        if (!data.refunded) {
+                            alert("无法退款");
+                        } else {
+                            if (document.getElementById('ticket_status_' + ticket_id).innerHTML == '进行中') {
+                                alert("退款成功");
+                                document.getElementById('ticket_status_' + ticket_id).innerHTML = '已退款';
+                            }
+                        }
+
+                    }
+
+                }
+            );
+        }
+    }
+
+
+    function makePayment(oid) {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/order/pay",
+            data: {
+                order_id: oid
+            },
+            success: function (data) {
+                if (data == 'ongoing') {
+                    alert("支付完毕！");
+                }
+            }
+        });
+
+    }
+
+
+    function redirectToRoutePage() {
+        let url = "http://" + window.location.host + "/service/route?";
+        url += "username=" + document.getElementById("person").innerHTML
+            + "&credit=" + document.getElementById("thisRole").innerHTML
+            + "&token=" + document.getElementById("tokenStore").innerHTML;
+        window.location.href = url;
+    }
+
+
+    function logout() {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/logout",
+            data: {
+                username: $("#person").text()
+            },
+            success: function (data) {
+                if (data.status == "OK") {
+                    alert(data.msg);
+                    window.location.href = "http://" + window.location.host + "/login";
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    }
+
+
+    function checkTicket(tid) {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/ticket/check",
+            data: {
+                ticket_id: tid
+            },
+            success: function (data) {
+                if (data == 1) {
+                    alert("完成检票");
+                }
+            }
+        });
+    }
+
+</script>
 
 </body>
+
 </html>

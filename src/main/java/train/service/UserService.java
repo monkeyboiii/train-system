@@ -67,6 +67,22 @@ public class UserService {
         return 1;
     }
 
+    public void postTokenByUsername(String username, String token) {
+        userMapper.postTokenByUsername(username, token);
+    }
+
+    public Integer confirmTokenByUsername(String username, String token) {
+        return userMapper.confirmTokenByUsername(username, token);
+    }
+
+    public void cleanTokenByUsername(String username) {
+        userMapper.cleanTokenByUsername(username);
+    }
+
+    public void assignCreditByUserId(Integer user_id, String credit) {
+        userMapper.assignCreditByUserId(user_id, credit);
+    }
+
     private static boolean isPhone(String str) {
         Pattern p;
         Matcher m;

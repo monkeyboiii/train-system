@@ -14,4 +14,6 @@ public interface TicketMapper {
 
     void checkTicketByTicketId(Integer ticket_id);
 
+    void checkTicketByTime();
+
 }

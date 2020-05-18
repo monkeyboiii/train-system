@@ -21,8 +21,12 @@ public class TicketService {
         return ticketMapper.refundTicketByTicketId(ticket_id);
     }
 
-    public void checkTicketByticketId(Integer ticket_id) {
+    public void checkTicketByTicketId(Integer ticket_id) {
         ticketMapper.checkTicketByTicketId(ticket_id);
+    }
+
+    public void checkTicketByTime() {
+        ticketMapper.checkTicketByTime();
     }
 
 }

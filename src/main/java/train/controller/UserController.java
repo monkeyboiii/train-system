@@ -21,7 +21,7 @@ public class UserController {
     UserService userService;
 
 
-    @PutMapping("/users")
+    @PostMapping("/users")
     public int insertUser(@RequestBody User user) {
         return userService.insertUser(user);
     }

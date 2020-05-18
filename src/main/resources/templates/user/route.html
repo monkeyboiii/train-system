@@ -4,23 +4,512 @@
     <meta charset="UTF-8">
     <title>Route</title>
 
-    <script th:src="@{/js/jquery.min.js}"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.4.1/css/bootstrap.min.css}"
+          rel="stylesheet"/>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
 
 </head>
+
 <body>
 
-<h1>路线</h1>
+<div align="center" style="margin-bottom: 3%">
+    <h1>路线</h1>
+    <span class="shadow carousel-fade" id="welcome">
+        Welcome, <label id="thisRole" th:text="${role}"></label> <label id="person" th:text="${username}"></label>!
+    </span>
+    <label id="tokenStore" th:text="${token}" hidden="hidden"></label>
+    <button class="btn-light" onclick="redirectToOrderPage()">订单页</button>
+    <button class="btn-light" onclick="logout()">退出</button>
 
-<form>
-    <label>
-        出发
-        <input type="text"/>
-    </label>
-    <label>
-        到达
-        <input type="text"/>
-    </label>
-</form>
+</div>
+
+
+<div class="container">
+
+    <div id="control">
+
+        <div id="filters">
+
+            <div class="font-weight-bold form-inline">
+                <input type="text" id="departCity" class="form-control " placeholder="出发城市"/>
+                <span align="center">&nbsp&nbspTO&nbsp&nbsp</span>
+                <input type="text" id="arriveCity" class="form-control" placeholder="到达城市"/>
+                <span align="center">&nbsp&nbsp</span>
+                <button onclick="queryStationByCity()" class="btn-dark rounded-right rounded-left">查看车站</button>
+            </div>
+
+            <div>
+                <div id="departStations" class="font-weight-light"></div>
+                <span id="breakLine" hidden="hidden" class="font-weight-lighter" style="color: #C7C7C7">
+                --------------------------------------------------------------------------------
+            </span>
+                <br id="standLoneBR" hidden="hidden">
+                <div id="arriveStations" class="font-weight-light"></div>
+            </div>
+
+            <div class="form-inline font-weight-bold" style="margin-top: 4%">
+                <label for="ticketDate">查询日期</label>
+                <span>&nbsp&nbsp</span>
+                <input type="date" id="ticketDate" class="d-block">
+                <span>&nbsp&nbsp</span>
+            </div>
+
+            <br>
+
+            <div class="form-inline font-weight-bold">
+
+                <input type="text" id="departStation" placeholder="出发车站" class="form-control"/>
+                <span>&nbsp&nbspTO&nbsp&nbsp</span>
+
+                <input type="text" id="arriveStation" placeholder="到达车站" class="form-control"/>
+
+                <span>&nbsp&nbsp</span>
+            </div>
+
+            <div style="margin: 2%">
+                <input type="checkbox" id="transit"/>
+                <label for="transit" class="font-weight-light">允许转乘（无直达情况下自动允许）</label>
+            </div>
+
+            <button onclick="queryRouteByCity()" class="btn btn-primary rounded-right">根据城市推荐</button>
+            <button onclick="queryRouteByStation()" class="btn btn-primary">根据车站查询</button>
+            <button onclick="emptyResult()" class="btn btn-danger rounded-right">清空结果</button>
+            <button onclick="emptyTicket()" class="btn btn-danger rounded-right">清空选票</button>
+
+
+        </div>
+
+
+        <div id="results" align="center">
+            <h4 class="font-weight-bold" align="center">查询结果</h4>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th>列车号</th>
+                    <th>出发站/序</th>
+                    <th>出发时间</th>
+                    <th>中转信息</th>
+                    <th>到达站/序</th>
+                    <th>到达时间/天</th>
+                    <th>票集</th>
+                </tr>
+                <tbody id="routeTable">
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <div id="chooseTicket">
+            <h4 class="font-weight-bold" align="center">选票</h4>
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th hidden="hidden">ticket_set_id</th>
+                    <th>列车号</th>
+                    <th>座位类型</th>
+                    <th>价格</th>
+                    <th>乘坐人</th>
+                    <th>增值服务</th>
+                    <th>删除</th>
+                </tr>
+                <tbody id="ticketTable">
+
+                </tbody>
+            </table>
+
+            <button onclick="submitOrder()" class="btn-primary btn">提交订单</button>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+    $(function () {
+        let time = new Date()
+        let day = ('0' + time.getDate()).slice(-2)
+        let month = ('0' + (time.getMonth() + 1)).slice(-2)
+        let today = time.getFullYear() + '-' + month + '-' + day
+        $('#ticketDate').val(today);
+    });
+
+
+    function queryStationByCity() {
+        let departCity = $("#departCity").val();
+        let arriveCity = $("#arriveCity").val();
+        if (!departCity && !arriveCity) {
+            alert("请输入城市！");
+            return;
+        }
+
+        if (departCity) {
+            let url1 = "http://" + window.location.host + "/city/" + departCity;
+
+            $.ajax({
+                dataType: "json",
+                url: url1,
+                success: function (data) {
+                    if ($.isEmptyObject(data.stations)) {
+                        alert("没有该城市: " + departCity);
+                        return;
+                    }
+                    $("#departStations").empty();
+                    $.each(data.stations, function () {
+                        $("#departStations").append(this.station_name + ' ');
+                    })
+                }
+
+            });
+        }
+
+        if (arriveCity) {
+            let url2 = "http://" + window.location.host + "/city/" + arriveCity;
+
+            $.ajax({
+                dataType: "json",
+                url: url2,
+                success: function (data) {
+                    if ($.isEmptyObject(data.stations)) {
+                        alert("没有该城市: " + arriveCity);
+                        return;
+                    }
+                    $("#arriveStations").empty();
+                    $.each(data.stations, function () {
+                        $("#arriveStations").append(this.station_name + ' ');
+                    })
+                }
+
+            });
+        }
+
+        document.getElementById("breakLine").removeAttribute("hidden");
+        document.getElementById("standLoneBR").removeAttribute("hidden");
+
+    }
+
+
+    function queryRouteByCity() {
+        let departCity = $("#departCity").val();
+        let arriveCity = $("#arriveCity").val();
+        let ticketDate = $("#ticketDate").val();
+        if (!(departCity && arriveCity && ticketDate)) {
+            alert("请输入城市/日期！");
+            return;
+        } else if (departCity === arriveCity) {
+            alert("推荐路线要求不同城市！");
+            return;
+        }
+
+        let url = "http://" + window.location.host + "/route/city";
+
+        $.ajax({
+            dataType: "json",
+            url: url,
+            method: "POST",
+            data: {
+                depart: departCity,
+                arrive: arriveCity,
+                date: ticketDate
+            },
+            success: function (data) {
+                loadRouteData(data);
+            },
+            error: function () {
+                alert("Something went wrong!");
+            }
+        });
+
+    }
+
+
+    function queryRouteByStation() {
+        let departStation = $("#departStation").val();
+        let arriveStation = $("#arriveStation").val();
+        let ticketDate = $("#ticketDate").val();
+        let transit = $("#transit").is(":checked");
+
+        if (!(departStation && arriveStation && ticketDate)) {
+            alert("请输入城市/日期！");
+            return;
+        }
+
+        let url = "http://" + window.location.host + "/route/station";
+
+        $.ajax({
+            dataType: "json",
+            url: url,
+            method: "POST",
+            data: {
+                depart: departStation,
+                arrive: arriveStation,
+                date: ticketDate,
+                transit: transit
+            },
+            success: function (data) {
+                loadRouteData(data);
+            }
+
+        });
+    }
+
+
+    function loadRouteData(data) {
+        if ($.isEmptyObject(data)) {
+            alert("没有类似的城市！");
+            return;
+        }
+        if ($.isEmptyObject(data.Route) && $.isEmptyObject(data.TransitRoute)) {
+            alert("没有类似的车次！");
+            return;
+        }
+
+        $("#routeTable").empty();
+
+        if (data.Route) {
+            $.each(data.Route, function () {
+                let tr = $("<tr align='center'/>");
+                let tcode = this.train_code;
+                $("<td/>").html(tcode).appendTo(tr);
+                $("<td/>").html(this.depart_station + "/" + this.depart_order).appendTo(tr);
+                $("<td/>").html(this.depart_time).appendTo(tr);
+                $("<td/>").html("->").appendTo(tr);
+                $("<td/>").html(this.arrive_station + "/" + this.arrive_order).appendTo(tr);
+                $("<td/>").html(this.arrive_time + (this.arrive_day == 0 ? "" : "(+" + this.arrive_day + ")")).appendTo(tr);
+
+                if (this.ticketSet) {
+                    let cnt = 1;
+                    let str = "";
+                    $.each(this.ticketSet.ticketTypes, function () {
+                        str += (
+                            "<label id='" + tcode + "_tsi_" + cnt + "' >"
+                            + "<label hidden='hidden'>" + this.ticket_set_id + "</label>"
+                            + "<label>" + this.seat_type + "</label>"
+                            + ": ￥"
+                            + "<label>" + this.price + "</label>"
+                            + ", 剩"
+                            + "<label>" + this.remain + "</label>"
+                            + "</label>"
+                            + "&nbsp"
+                            + "<button class='btn btn-light small' onclick='addIntoTicketTable(\"" + tcode + "\", " + cnt + ")'>➕</button>"
+                            + "<br>"
+                        );
+                        cnt++;
+                    });
+                    $("<td/>").html(str).appendTo(tr);
+                }
+
+                $("#routeTable").append(tr);
+            });
+        }
+
+        if (data.TransitRoute) {
+            $.each(data.TransitRoute, function ()   {
+                let tr = $("<tr align='center'/>");
+                let tcode = this.train_code;
+                let ttcode = this.transit_train_code;
+
+                $("<td/>").html(tcode + "->" + ttcode).appendTo(tr);
+                $("<td/>").html(this.depart_station + "/" + this.depart_order).appendTo(tr);
+                $("<td/>").html(this.depart_time).appendTo(tr);
+                $("<td/>").html("->"
+                    + this.arrive_time + (this.arrive_day == 0 ? "" : "(+" + this.arrive_day + ")") + "<br>"
+                    + this.arrive_order + "/" + this.arrive_station + "/" + this.transit_depart_order + "<br>"
+                    + this.transit_depart_time
+                    + "->").appendTo(tr);
+
+                $("<td/>").html(this.transit_arrive_station + "/" + this.transit_arrive_order).appendTo(tr);
+                $("<td/>").html(this.transit_arrive_time + (this.transit_arrive_day == 0 ? "" : "(+" + this.transit_arrive_day + ")")).appendTo(tr);
+
+
+                if (this.ticketSet && this.transit_ticketSet) {
+                    let cnt = 1;
+                    let str = "";
+                    $.each(this.ticketSet.ticketTypes, function () {
+                        str += (
+                            "<label id='" + tcode + "_tsi_" + cnt + "' >"
+                            + "<label hidden='hidden'>" + this.ticket_set_id + "</label>"
+                            + "<label>" + this.seat_type + "</label>"
+                            + ": ￥"
+                            + "<label>" + this.price + "</label>"
+                            + ", 剩"
+                            + "<label>" + this.remain + "</label>"
+                            + "</label>"
+                            + "&nbsp"
+                            + "<button class='btn btn-light small' onclick='addIntoTicketTable(\"" + tcode + "\", " + cnt + ")'>➕</button>"
+                            + "<br>"
+                        );
+                        cnt++;
+                    });
+
+                    let transit_cnt = 1;
+                    let transit_str = "";
+                    $.each(this.transit_ticketSet.ticketTypes, function () {
+                        transit_str += (
+                            "<label id='" + ttcode + "_tsi_" + transit_cnt + "' >"
+                            + "<label hidden='hidden'>" + this.ticket_set_id + "</label>"
+                            + "<label>" + this.seat_type + "</label>"
+                            + ": ￥"
+                            + "<label>" + this.price + "</label>"
+                            + ", 剩"
+                            + "<label>" + this.remain + "</label>"
+                            + "</label>"
+                            + "&nbsp"
+                            + "<button class='btn btn-light small' onclick='addIntoTicketTable(\"" + ttcode + "\", " + transit_cnt + ")'>➕</button>"
+                            + "<br>"
+                        );
+                        transit_cnt++;
+                    });
+
+                    $("<td/>").html(
+                        "<label class='font-weight-light' style='color: #C7C7C7'>----" + tcode + "----</label><br>"
+                        + str
+                        + "<br>"
+                        + "<label class='font-weight-light' style='color: #C7C7C7'>----" + ttcode + "----</label><br>"
+                        + transit_str
+                    ).appendTo(tr);
+
+                }
+
+                $("#routeTable").append(tr);
+
+            });
+        }
+
+    }
+
+
+    function incrementId() {
+        let n = 0;
+        return function () {
+            return n++;
+        }
+    }
+
+
+    let incr = incrementId();
+
+
+    function addIntoTicketTable(code, cnt) {
+        let labelId = code + "_tsi_" + cnt;
+        let ticket = document.getElementById(labelId);
+
+        if (ticket.children[3].innerHTML == 0) {
+            alert("无剩票！");
+            return;
+        }
+
+        let number = incr();
+
+        let tr = $("<tr align='center' id='row_" + number + "'/>");
+        $("<td hidden='hidden'/>").html(ticket.children[0].innerHTML).appendTo(tr);
+        $("<td/>").html(code).appendTo(tr);
+        $("<td/>").html(ticket.children[1].innerHTML).appendTo(tr);
+        $("<td/>").html(ticket.children[2].innerHTML).appendTo(tr);
+        $("<td/>").html("<input type='text' "
+            + "placeholder='" + $("#person").text()
+            + "' value='" + $("#person").text()
+            + "' id='row_" + number + "_input'>").appendTo(tr);
+        $("<td/>").html("<input type='checkbox'>").appendTo(tr);
+        $("<td/>").html("<button class='btn btn-danger' onclick='deleteTicket(" + number + ")' id='row_" + number + "_delete'>删除</button>").appendTo(tr);
+
+        $("#ticketTable").append(tr);
+    }
+
+
+    function emptyResult() {
+        $("#routeTable").empty();
+    }
+
+
+    function emptyTicket() {
+        $("#ticketTable").empty();
+    }
+
+
+    function deleteTicket(number) {
+        let obj = "row_" + number;
+        document.getElementById(obj).remove();
+    }
+
+
+    function submitOrder() {
+        let rows = document.getElementById("ticketTable").children;
+        let tsis = [];
+        let recipients = [];
+        for (let i = 1; i <= rows.length; i++) {
+            let key = rows[i - 1].id.substr(4);
+            let value = document.getElementById("row_" + key + "_input").value;
+            tsis.push(rows[i - 1].cells[0].innerHTML);
+            recipients.push(value);
+        }
+
+        let url = "http://" + window.location.host + "/book";
+        let obj = {
+            "creator": $("#person").text(),
+            "tsis": tsis,
+            "recipients": recipients
+        };
+
+        $.ajax({
+            method: "post",
+            url: url,
+            data: JSON.stringify(obj),
+            contentType: 'application/json',
+            dataType: "json",
+            success: function (data) {
+                if (data == -1)
+                    alert("错误的订单！");
+                else {
+                    alert("您的订单 #" + data + " 已生成！")
+                    let conf = confirm("是否转到付款页？");
+                    if (conf) {
+                        let url = "http://" + window.location.host + "/service/order?";
+                        url += "username=" + document.getElementById("person").innerHTML
+                            + "&credit=" + document.getElementById("thisRole").innerHTML
+                            + "&token=" + document.getElementById("tokenStore").innerHTML;
+                        window.location.href = url;
+                    }
+                }
+
+            }
+        });
+
+    }
+
+
+    function redirectToOrderPage() {
+        let url = "http://" + window.location.host + "/service/order?";
+        url += "username=" + document.getElementById("person").innerHTML
+            + "&credit=" + document.getElementById("thisRole").innerHTML
+            + "&token=" + document.getElementById("tokenStore").innerHTML;
+        window.location.href = url;
+    }
+
+
+    function logout() {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/logout",
+            data: {
+                username: $("#person").text()
+            },
+            success: function (data) {
+                if (data.status == "OK") {
+                    alert(data.msg);
+                    window.location.href = "http://" + window.location.host + "/login";
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    }
+
+</script>
 
 </body>
 </html>

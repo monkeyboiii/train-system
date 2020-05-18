@@ -5,13 +5,13 @@
 
 <mapper namespace="train.mapper.TicketSetMapper">
 
-    <resultMap id="TicketSetResultMap" type="TicketSet">
+    <resultMap id="TicketSetResultMap" type="train.model.TicketSet">
 
         <!--Unique route_id by query from routeMapper-->
         <id property="route_id" column="route_id"/>
         <result property="date" column="date"/>
 
-        <collection property="ticketTypes" ofType="TicketType">
+        <collection property="ticketTypes" ofType="train.model.TicketType">
             <id property="ticket_set_id" column="ticket_set_id"/>
             <result property="seat_type" column="seat_type"/>
             <result property="price" column="price"/>
@@ -33,5 +33,62 @@
         where rp.route_id = #{route_id}
           and ts.ticket_date = #{date}::date;
     </select>
+
+
+    <update id="generateTicketSetWithConditions">
+        insert into ticket_set (rp_id, ticket_date, remain)
+        (select rpp.rp_id, #{date}::date date, rpp.total_num
+        from route_price rpp
+        where rpp.rp_id in (select rp_id
+        from route_price rp
+        join route r on rp.route_id = r.route_id
+        <if test="stations1 != null and stations1.size() != 0">
+            where depart_station not in
+            <foreach item="item_1" collection="stations1" open="(" separator="," close=")">
+                #{item_1}
+            </foreach>
+            and arrive_station not in
+            <foreach item="item_2" collection="stations2" open="(" separator="," close=")">
+                #{item_2}
+            </foreach>
+        </if>
+        )
+        );
+    </update>
+
+
+    <select id="countPossibleRoute" resultType="int">
+        select count(*) , #{date}::date not_date
+        from route_price rpp
+        where rpp.rp_id in (select rp_id
+        from route_price rp
+        join route r on rp.route_id = r.route_id
+        <if test="stations1 != null and stations1.size() != 0">
+            where depart_station not in
+            <foreach item="item_1" collection="stations1" open="(" separator="," close=")">
+                #{item_1}
+            </foreach>
+            and arrive_station not in
+            <foreach item="item_2" collection="stations2" open="(" separator="," close=")">
+                #{item_2}
+            </foreach>
+        </if>
+        );
+    </select>
+
+
+    <select id="checkIfTicketSetIsThere" resultType="boolean">
+        select exists(select ticket_date from ticket_set where ticket_date = #{date}::date);
+    </select>
+
+    <update id="dropIndex">
+        drop index if exists ts_rp_index;
+    </update>
+
+
+    <update id="createIndex">
+        create index ts_rp_index
+            on ticket_set (rp_id);
+    </update>
 
 </mapper>

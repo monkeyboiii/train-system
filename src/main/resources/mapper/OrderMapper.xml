@@ -6,11 +6,12 @@
 <mapper namespace="train.mapper.OrderMapper">
 
 
-    <resultMap id="OrderResultMap" type="Order">
+    <resultMap id="OrderResultMap" type="train.model.Order">
         <id property="order_id" column="order_id"/>
         <result property="create_time" column="create_time"/>
         <result property="status" column="status"/>
         <result property="user_id" column="user_id"/>
+        <result property="price" column="price"/>
 
         <collection property="tickets" ofType="Ticket" column="order_id"
                     select="train.mapper.TicketMapper.queryTicketByOrderId"/>
@@ -23,7 +24,8 @@
         create_time,
         status,
         o.user_id,
-        username creator_name
+        username creator_name,
+        order_total_price(order_id) price
         from orders o
         join users u on u.user_id = o.user_id
         where o.user_id = #{user_id}
@@ -40,7 +42,8 @@
                create_time,
                status,
                o.user_id,
-               username creator_name
+               username                    creator_name,
+               order_total_price(order_id) price
         from orders o
                  join users u on u.user_id = o.user_id
         where o.order_id = #{order_id};
@@ -65,7 +68,8 @@
                create_time,
                status,
                user_id,
-               creator_name
+               creator_name,
+               order_total_price(order_id) price
         from secure_order_by_order_id(#{order_id});
     </select>
 
@@ -75,7 +79,8 @@
                create_time,
                status,
                user_id,
-               creator_name
+               creator_name,
+               order_total_price(order_id) price
         from refund_order_by_order_id(#{order_id});
     </select>
 

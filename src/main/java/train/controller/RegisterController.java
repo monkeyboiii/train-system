@@ -7,7 +7,6 @@ import train.model.User;
 import train.service.UserService;
 
 @Controller
-@RequestMapping
 public class RegisterController {
 
     @Autowired

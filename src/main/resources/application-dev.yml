@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: "jdbc:postgresql://localhost:5432/train"
+    url: "jdbc:postgresql://192.168.31.169:5432/train"
     username: train_admin
     password: training
     driver-class-name: org.postgresql.Driver

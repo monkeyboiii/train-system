@@ -4,17 +4,15 @@
 
 <mapper namespace="train.mapper.CityMapper">
 
-    <resultMap id="CityResultMap" type="City">
-
+    <resultMap id="CityResultMap" type="train.model.City">
         <id property="city_name" column="city_name"/>
-        <collection property="stations" ofType="Station"/>
-
+        <collection property="stations" ofType="train.model.Station"/>
     </resultMap>
 
 
     <select id="queryCityByName" parameterType="String" resultMap="CityResultMap">
         select city_name, station_name
-        from station_simple
+        from station
         where city_name like '%${city_name}%';
     </select>
 

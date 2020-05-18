@@ -6,41 +6,39 @@
 <mapper namespace="train.mapper.TicketMapper">
 
 
-    <select id="queryTicketByOrderId" resultType="Ticket">
-        select t.ticket_id     ticket_id,
-               t.ticket_set_id ticket_set_id,
-               (select rp.seat_type
-                from route_price rp
-                where rp.rp_id = (select a.rp_id
-                                  from ticket_set a
-                                  where a.ticket_set_id = t.ticket_set_id))
-                               seat_type,
-               cast((chr((t.seat_number - 1) / 5 + 65) || (t.seat_number - 1) % 5 + 1) as varchar)
-                               seat_number,
-               t.refunded      refunded,
-               (select a.ticket_date from ticket_set a where a.ticket_set_id = t.ticket_set_id)
-                               date,
-               u.username      passenger_name
-        from ticket t
-                 join users u on t.passenger_id = u.user_id
-        where order_id = #{order_id};
+    <select id="queryTicketByOrderId" resultType="train.model.Ticket">
+        select ticket_id,
+               ticket_set_id,
+               train_code,
+               depart_station,
+               depart_time,
+               arrive_station,
+               arrive_time,
+               date,
+               arrive_day,
+               seat_type,
+               seat_number,
+               price,
+               refunded,
+               finished,
+               passenger_name
+        from ticket_from_orderid(#{order_id});
     </select>
 
 
-    <select id="refundTicketByTicketId" resultType="Ticket">
-        select ticket_id,
-               ticket_set_id,
-               seat_type,
-               seat_number,
-               refunded,
-               date,
-               passenger_name
+    <select id="refundTicketByTicketId" resultType="train.model.Ticket">
+        select *
         from refund(#{ticket_id});
     </select>
 
 
     <select id="checkTicketByTicketId">
         call check_ticket_by_ticket_id(#{ticket_id});
+    </select>
+
+
+    <select id="checkTicketByTime">
+        call whole_check();
     </select>
 
 

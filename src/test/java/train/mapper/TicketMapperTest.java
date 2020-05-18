@@ -19,14 +19,11 @@ public class TicketMapperTest {
 
     @Test
     public void myTicketMapperTest() {
-        List<Ticket> tickets = ticketMapper.queryTicketByOrderId(7);
+        List<Ticket> tickets = ticketMapper.queryTicketByOrderId(23);
 
         for (Ticket t : tickets) {
-            System.out.println(t);
-            if (t.getTicket_id() == 9) {
-                Ticket ticket = ticketMapper.refundTicketByTicketId(t.getTicket_id());
-                System.out.println(ticket);
-            }
+            Ticket ticket = ticketMapper.refundTicketByTicketId(t.getTicket_id());
+            System.out.println(ticket);
         }
     }
 

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage</title>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.4.1/css/bootstrap.min.css}"
+          rel="stylesheet"/>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.0/jquery.min.js"
+            th:src="@{/webjars/jquery/3.5.0/jquery.min.js}"></script>
+
+</head>
+<body>
+
+<div align="center" class="container-fluid">
+    <div align="center" style="margin-bottom: 3%">
+        <h1>管理</h1>
+        <span class="shadow carousel-fade" id="welcome">
+        Welcome, <label id="thisRole" th:text="${role}"></label> <label id="person" th:text="${username}"></label>!
+    </span>
+        <label id="tokenStore" th:text="${token}" hidden="hidden"></label>
+        <button class="btn-light" onclick="logout()">退出</button>
+    </div>
+
+
+    <div>
+        <h5>检票</h5>
+        <input type="text" id="tid_input" placeholder="票号">
+        <button class="btn-light" onclick="checkTicketByTid()">检票票号</button>
+        <label>&nbsp</label>
+        <button class="btn-light" onclick="checkTicketByTime()">全局检票</button>
+    </div>
+
+    <br>
+    <div>
+        <h5>查车</h5>
+        <input type="text" id="train_code" placeholder="列车号">
+        <button class="btn-light" onclick="queryTrainByTrainCode()">详细信息</button>
+        <button class="btn-danger" onclick="emptyTrainQuery()">清空结果</button>
+        <label>&nbsp</label>
+        <br>
+        <div>
+            <table class="table-active table-bordered table-hover">
+                <thead>
+                <th>列车号</th>
+                <th>站名/序</th>
+                <th>所在城市</th>
+                <th>到达时间</th>
+                <th>出发时间</th>
+                </thead>
+                <tbody id="stations">
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <br>
+        <div>
+            <h5>车站管理</h5>
+            <div>
+                <textarea id="stationsToExclude" style="width: 50%;height: 50%">
+                </textarea>
+            </div>
+
+            <div>
+                <label>（请手动输入，生成的新日票中将不经过以上车站）</label>
+                <br>
+                <input type="date" class="custom-select w-25" id="dateSelect">
+                <br>
+                <button class="btn-light" onclick="generateTicketSet()">生成新日票集</button>
+                <button class="btn-danger" onclick="emptyStationSet()">清空所选车站</button>
+
+                <div id="dialog_message">
+                </div>
+
+            </div>
+
+        </div>
+
+        <br>
+        <div class="border-dark">
+
+            <input type="text" id="trainAdd" placeholder="列车号">
+            <input type="text" id="stationAdd" placeholder="站名">
+            <label>到站时间<input type="time" id="arriveTimeAdd"></label>
+            <label>到达天数<input type="number" id="arriveDayAdd"></label>
+            <button class="btn-light" onclick="addStation()">增</button>
+            <br>
+            <input type="text" id="trainDelete" placeholder="列车号">
+            <input type="text" id="stationDelete" placeholder="站名">
+            <button class="btn-light" onclick="deleteStation()">减</button>
+        </div>
+
+
+        <br>
+        <div>
+            <h5>身份管理</h5>
+            <input type="text" id="identifier" placeholder="用户身份">
+            <div class="form w-25">
+                <label for="creditChange">角色</label>
+                <select id="creditChange">
+                    <option value="u">用户</option>
+                    <option value="a">管理</option>
+                    <option value="t">测试</option>
+                </select>
+                <button class="btn-light" onclick="changeCredit()">更改权限</button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script>
+    function changeCredit() {
+        if (!$("#identifier").val()) {
+            alert("请填入用户！");
+            return;
+        }
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/assignCredit",
+            data: {
+                username: $("#person").text(),
+                token: $("#tokenStore").text(),
+                userToken: $("#identifier").val(),
+                credit: $("#creditChange").val(),
+            },
+            success: function (data) {
+                alert(data.msg);
+            }
+        });
+
+    }
+
+
+    function addStation() {
+        if (!$("#trainAdd").val()) {
+            alert("请填入列车号");
+            return;
+        }
+        if (!$("#stationAdd").val()) {
+            alert("请填入站名");
+            return;
+        }
+        if (!$("#arriveTimeAdd").val()) {
+            alert("请填入到站时间");
+            return;
+        }
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/addStation",
+            data: {
+                username: $("#person").text(),
+                token: $("#tokenStore").text(),
+                train_code: $("#trainAdd").val(),
+                station_name: $("#stationAdd").val(),
+                time: $("#arriveTimeAdd").val() + ":00",
+                arrive_day: $("#arriveDayAdd").val()
+            },
+            success: function (data) {
+                alert(data.msg);
+            }
+        });
+    }
+
+
+    function deleteStation() {
+        if (!$("#trainDelete").val()) {
+            alert("请填入列车号");
+            return;
+        }
+        if (!$("#stationDelete").val()) {
+            alert("请填入站名");
+            return;
+        }
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/deleteStation",
+            data: {
+                username: $("#person").text(),
+                token: $("#tokenStore").text(),
+                train_code: $("#trainDelete").val(),
+                station_name: $("#stationDelete").val(),
+            },
+            success: function (data) {
+                alert(data.msg);
+            }
+        });
+    }
+
+
+    function generateTicketSet() {
+        let a = confirm("确认？");
+        if (!a) return;
+
+        if ($("#dateSelect").val() == "" || $.isEmptyObject($("#dateSelect"))) {
+            alert("日期？");
+            return;
+        }
+
+        let value = $("#stationsToExclude").val().trim();
+        let arr = value.split(/[ ,，|、\\&。.\t]+/);
+        arr.filter((obj) => obj.trim());
+        let obj = {
+            "username": $("#person").text(),
+            "token": $("#tokenStore").text(),
+            "date": $("#dateSelect").val(),
+            "stations": arr
+        };
+
+        $.ajax({
+            method: "post",
+            contentType: 'application/json',
+            dataType: "json",
+            data: JSON.stringify(obj),
+            url: "http://" + window.location.host + "/admin/generate",
+            beforeSend: function () {
+                $('#dialog_message').text('正在处理，请稍等！');
+            },
+            success: function (data) {
+                alert(data.msg);
+                $('#dialog_message').text("");
+            }
+        });
+    }
+
+
+    function queryTrainByTrainCode() {
+        if (!$("#train_code").val()) {
+            alert("请填入列车号");
+            return;
+        }
+        emptyTrainQuery();
+
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/train",
+            data: {
+                train_code: $("#train_code").val()
+            },
+            success: function (data) {
+                if ($.isEmptyObject(data)) {
+                    alert("错误车号！");
+                    return;
+                }
+
+                let train = data.train_code;
+
+                for (let i = 0; i < data.stations.length; i++) {
+                    let tr = $("<tr align='center'/>");
+
+                    $("<td/>").html(train).appendTo(tr);
+                    $("<td/>").html(data.stations[i].station_name).appendTo(tr);
+                    $("<td/>").html(data.stations[i].city_name).appendTo(tr);
+                    if (i == 0) {
+                        $("<td/>").html("--:--:--").appendTo(tr);
+                        $("<td/>").html(data.depart_times[i]).appendTo(tr);
+                    } else if (i == data.stations.length - 1) {
+                        $("<td/>").html(data.arrive_times[i]).appendTo(tr);
+                        $("<td/>").html("--:--:--").appendTo(tr);
+                    } else {
+                        $("<td/>").html(data.arrive_times[i]).appendTo(tr);
+                        $("<td/>").html(data.depart_times[i]).appendTo(tr);
+                    }
+
+                    $("#stations").append(tr);
+                }
+            }
+        });
+    }
+
+
+    function checkTicketByTid() {
+        if (!$("#tid_input").val()) {
+            alert("请填入票号");
+            return;
+        }
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/check",
+            data: {
+                username: $("#person").text(),
+                token: $("#tokenStore").text(),
+                ticket_id: $("#tid_input").val()
+            },
+            success: function (data) {
+
+                alert(data.msg);
+            }
+        });
+    }
+
+
+    function checkTicketByTime() {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/admin/check",
+            data: {
+                username: $("#person").text(),
+                token: $("#tokenStore").text()
+            },
+            success: function (data) {
+
+                alert(data.msg);
+            }
+        });
+    }
+
+
+    function emptyTrainQuery() {
+        $("#stations").empty();
+    }
+
+
+    function emptyStationSet() {
+        $("#stationsToExclude").val("");
+    }
+
+
+    function logout() {
+        $.ajax({
+            method: "post",
+            url: "http://" + window.location.host + "/logout",
+            data: {
+                username: $("#person").text()
+            },
+            success: function (data) {
+                if (data.status == "OK") {
+                    alert(data.msg);
+                    window.location.href = "http://" + window.location.host + "/login";
+                } else {
+                    alert(data.msg);
+                }
+            }
+        });
+    }
+</script>
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@
 
 <mapper namespace="train.mapper.RouteMapper">
 
-    <resultMap id="RouteResultMap" type="Route">
+    <resultMap id="RouteResultMap" type="train.model.Route">
 
         <id property="route_id" column="route_id"/>
         <result property="train_code" column="train_code"/>
@@ -27,39 +27,64 @@
 
 
     <select id="queryRouteByStation" resultMap="RouteResultMap">
-        with t as (select r.route_id,
-                          r.depart_station,
-                          r.arrive_station,
-                          t.*
-                   from route r
-                            join timetable t on r.train_code = t.train_code
-                   where r.depart_station = #{depart}
-                     and r.arrive_station = #{arrive}
-                     and t.station_name in (#{depart}, #{arrive}))
-        select t1.route_id                                           route_id,
-               t1.train_code                                         train_code,
-               t1.depart_station                                     depart_station,
+        select r.route_id                                            route_id,
+               r.train_code                                          train_code,
+               r.depart_station                                      depart_station,
                t1.depart_time                                        depart_time,
-               case (t1.depart_time is null)
+               case (t1.arrive_time is null)
                    when true then '始'
                    when false then '过' end                           depart_order,
-               t2.arrive_station                                     arrive_station,
+               r.arrive_station                                      arrive_station,
                t2.arrive_time                                        arrive_time,
-               case (t2.arrive_time is null)
+               case (t2.depart_time is null)
+                   when true then '终'
+                   when false then '过' end                           arrive_order,
+               case (t2.arrive_day - t1.arrive_day is null)
+                   when true then 0
+                   when false then t2.arrive_day - t1.arrive_day end arrive_day,
+               cast(#{date} as varchar)                              date
+        from route r
+                 join timetable t1 on r.train_code = t1.train_code and r.depart_station = t1.station_name
+                 join timetable t2 on r.train_code = t2.train_code and r.arrive_station = t2.station_name
+        where depart_station = #{depart}
+          and arrive_station = #{arrive}
+        order by EXTRACT(Epoch from
+                         (t2.arrive_time - t1.depart_time +
+                          cast((t2.arrive_day || 'days') as interval)))
+        limit 100;
+    </select>
+
+
+    <select id="queryRouteByCity" resultMap="RouteResultMap">
+        select r.route_id                                            route_id,
+               r.train_code                                          train_code,
+               r.depart_station                                      depart_station,
+               t1.depart_time                                        depart_time,
+               case (t1.arrive_time is null)
+                   when true then '始'
+                   when false then '过' end                           depart_order,
+               r.arrive_station                                      arrive_station,
+               t2.arrive_time                                        arrive_time,
+               case (t2.depart_time is null)
                    when true then '过'
                    when false then '终' end                           arrive_order,
                case (t2.arrive_day - t1.arrive_day is null)
                    when true then 0
                    when false then t2.arrive_day - t1.arrive_day end arrive_day,
                cast(#{date} as varchar)                              date
-        from t t1
-                 join t t2 on t1.route_id = t2.route_id and t1.station_name != t2.station_name
-        where t1.station_name = #{depart}
-          and t2.station_name = #{arrive};
+        from route r
+                 join timetable t1 on r.train_code = t1.train_code and r.depart_station = t1.station_name
+                 join timetable t2 on r.train_code = t2.train_code and r.arrive_station = t2.station_name
+        where depart_station in (select station_name from station where city_name = #{depart})
+          and arrive_station in (select station_name from station where city_name = #{arrive})
+        order by EXTRACT(Epoch from
+                         (t2.arrive_time - t1.depart_time +
+                          cast((t2.arrive_day || 'days') as interval)))
+        limit 100;
     </select>
 
 
-    <resultMap id="TransitRouteResultMap" type="TransitRoute">
+    <resultMap id="TransitRouteResultMap" type="train.model.TransitRoute">
 
 
         <!--1. First train ride from start to transit station-->
@@ -101,14 +126,13 @@
 
         <!--2.-->
         <association property="transit_ticketSet"
-                     column="{route_id=route_id,date=date}"
+                     column="{route_id=transit_route_id,date=transit_date}"
                      select="train.mapper.TicketSetMapper.queryTicketSetByRouteIdAndDate">
         </association>
 
     </resultMap>
 
 
-    <!--TODO-->
     <select id="queryTransitRouteByStation" resultMap="TransitRouteResultMap">
         select route_id,
                train_code,
@@ -128,10 +152,22 @@
                transit_arrive_order,
                transit_arrive_time,
                transit_arrive_day,
-               cast(#{date} as varchar) date
+               cast(#{date} as varchar) date,
+               cast(case cast(case transit_depart_time &lt; arrive_time
+                                  when true then arrive_day + 1
+                                  when false then arrive_day end as integer)
+                        when 0 then #{date}::date
+                        when 1 then #{date}::date + '1 day'::interval
+                        when 2 then #{date}::date + '2 day'::interval
+                        when 3 then #{date}::date + '3 day'::interval
+                        when 4 then #{date}::date + '4 day'::interval
+                        when 5 then #{date}::date + '5 day'::interval
+                   end as varchar) as   transit_date
         from transit_route_query(#{depart}, #{arrive});
     </select>
 
+
+    <!--OLD Method-->
     <!--<select id="queryTransitRouteByStation" resultType="TransitRoute">
         select a.train_code                train_code,
                a.depart_station            depart_station,

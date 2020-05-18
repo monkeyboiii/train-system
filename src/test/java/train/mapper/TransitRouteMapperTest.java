@@ -21,7 +21,8 @@ public class TransitRouteMapperTest {
     public void myTransitRouteMapperTest() {
 
         List<TransitRoute> transitRoutes = routeMapper.
-                queryTransitRouteByStation("玉林", "吐鲁番", "2020-05-21");
+//                queryTransitRouteByStation("玉林", "吐鲁番", "2020-05-21");
+                queryTransitRouteByStation("烟台", "成都", "2020-05-21");
 
         System.out.println("transitRoutes.size() = " + transitRoutes.size());
 

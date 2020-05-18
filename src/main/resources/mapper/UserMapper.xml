@@ -27,21 +27,21 @@
         where user_id = #{user_id};
     </update>
 
-    <select id="queryUserByUsername" parameterType="String" resultType="User">
+    <select id="queryUserByUsername" parameterType="String" resultType="train.model.User">
         select
         <include refid="allFields"/>
         from users
         where username = #{username};
     </select>
 
-    <select id="queryUserById" parameterType="String" resultType="User">
+    <select id="queryUserById" parameterType="String" resultType="train.model.User">
         select
         <include refid="allFields"/>
         from users
         where id = #{id};
     </select>
 
-    <select id="queryUserByPhone" parameterType="String" resultType="User">
+    <select id="queryUserByPhone" parameterType="String" resultType="train.model.User">
         select
         <include refid="allFields"/>
         from users
@@ -53,5 +53,30 @@
         from users
         where user_id = #{user_id};
     </delete>
+
+    <update id="postTokenByUsername">
+        update users
+        set token = #{token}
+        where username = #{username};
+    </update>
+
+    <update id="assignCreditByUserId">
+        update users
+        set credit = #{credit}
+        where user_id = #{user_id};
+    </update>
+
+    <select id="confirmTokenByUsername" resultType="int">
+        select user_id
+        from users
+        where username = #{username}
+          and token = #{token};
+    </select>
+
+    <update id="cleanTokenByUsername" parameterType="String">
+        update users
+        set token = ''
+        where username = #{username};
+    </update>
 
 </mapper>
