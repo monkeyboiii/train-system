@@ -4,7 +4,7 @@
 
 Detail in data/relation
 
-![relation](https://github.com/monkeyboiii/DB_Project/blob/master/Data/relation/relation.png)
+![relation](https://github.com/monkeyboiii/DB_Project/blob/master/Data/relation/relation_new.jpg)
 
 ## Organize
 
